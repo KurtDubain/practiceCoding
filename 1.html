@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    1
+    <script>
+        function ListNode(x){
+            this.val = x;
+            this.next = null;
+        }
+        function reverse(head){
+            let pre = null
+            let cur = head
+            
+            while(cur){
+                let next = head.next
+                cur.next = pre
+                pre = cur
+                cur = next
+
+            }
+            console.log(pre);
+            return pre
+        }
+
+        function isPail( head ) {
+            if(!head || !head.text){return true}
+            let slow = head
+            let fast = head
+            while(fast.next.next){
+                slow = slow.next
+                fast = fast.next.next
+            }
+            let backArrayReverse = reverse(slow.next)
+            console.log(backArrayReverse)
+
+            let p1 = head
+            let p2 = backArrayReverse
+            while(p1){
+                if(p1.val !== p2.val){
+                    return false
+                }
+                p1 = p1.next
+                p2 = p2.next
+                console.log(p1,p2)
+            }
+
+            return true
+            
+
+        }
+        const node1 = new ListNode(1) 
+        const node2 = new ListNode(2) 
+        const node3 = new ListNode(3) 
+
+        const node4 = new ListNode(1) 
+        // const node5 = new ListNode(1) 
+        // const node6 = new ListNode(1) 
+        // const node7 = new ListNode(1) 
+        node1.next = node2
+        node2.next = node3
+        node3.next = node4
+        console.log(isPail(node1))
+
+
+
+        function reverse( x ) {
+    // 判断是否为负数
+    const isNe = x < 0
+    // 全部转正数
+    let num = Math.abs(x)
+
+    let reverseNum = 0
+    // 计算数值部分的翻转数值
+    while( num > 0){
+        reverseNum = reverseNum *10 +(num % 10)
+        num = Math.floor(num /10)
+    }
+    // 处理负数
+    if(isNe){
+        reverseNum = - reverseNum
+    }
+    // 判断范围是否超出规定
+    if(reverseNum < Math.pow(-2,31) || reverseNum > Math.pow(2,31) - 1){
+        return 0
+    }
+    return reverseNum
+
+}
+
+
+ 
+function multiply( A ) {
+    let n = A.length
+    // 构建所有元素的左乘积和右乘积
+    let leftRes = new Array(n)
+    let rightRes = new Array(n)
+    // 构建最后的结果
+    let lastRes = new Array(n)
+
+    // 逐次计算
+    leftRes[0] = 1
+    for(let i = 1;i < n;i++){
+        leftRes[i] = leftRes[i - 1]*A[i - 1]
+    }
+    rightRes[n-1] = 1
+    for(let i = n-2;i >= 0;i--){
+        rightRes[i] = rightRes[i + 1]*A[i+1]
+    }
+    // 将左右的成绩计算，赋值给对应的总结果
+    for(let i = 0;i < n;i++){
+        lastRes[i] = leftRes[i] * rightRes[i]
+    }
+    return lastRes
+
+}
+
+
+
+function reverse(head){
+    let pre = null
+    let cur = head
+    while(cur){
+        let next = head.next
+        cur.next = pre
+        pre = cur
+        cur = next
+
+    }
+    return pre
+}
+
+function isPail( head ) {
+    // 判断当前链表的节点数量是否过短
+    if(!head || !head.text){return true}
+    let slow = head
+    let fast = head
+    // 截取中间的链表
+    while(fast.next&&fast.next.next){
+        slow = slow.next
+        fast = fast.next.next
+    }
+    // 翻转后半段链表
+    let backArrayReverse = reverse(slow.next)
+
+    let p1 = head
+    let p2 = backArrayReverse
+    // 对两个链表逐次判断是否相同，如果全都相同则为回文链表
+    while(p2){
+        if(p1.val !== p2.val){
+            return false
+        }
+        p1 = p1.next
+        p2 = p2.next
+    }
+
+    return true
+    
+
+}
+
+function MySort2( arr ){
+    // 快速排序 
+
+    if(arr.length <= 1){
+        return arr
+    }
+
+    const n = arr[arr.length-1]
+    const left = []
+    const right = []
+    for(let i = 0;i< arr.length-1;i++){
+        if(arr[i]<n){
+            left.push(arr[i])
+        }else{
+            right.push(arr[i])
+        }
+    }
+    return [...MySort2(left),n,...MySort2(right)]
+}
+
+        function Deepclone(obj){
+            if(obj === null || typeof(obj)!==Object){
+                return obj
+            }
+            let clone
+            if(Array.isArray(obj)){
+                clone = []
+                for(let i = 0;i< obj.length;i++){
+                    clone[i] = Deepclone(obj[i])
+                }
+            }
+            else{
+                clone = {}
+                for(key in obj){
+                    clone[key] = Deepclone(obj[key])
+                }
+            }
+            return clone
+        }
+
+        function throttle(func,delay){
+            let timer = null
+            return function(...arg){
+                if(!timer){
+                    timer = setTimeout(()=>{
+                        func.apply(this,arg)
+                        timer = null
+                    },delay)
+                }
+            }
+        }
+
+        function debounce(func,delay){
+            let timer = null
+            return function(...arg){
+                clearTimeout(timer)
+                timer = setTimeout(()=>{
+                    func.apply(this,arg)
+                },delay)
+            }
+        }
+
+
+        class Eventbus{
+            constructor(){
+                this.event = {}
+            }
+            on(name,func){
+                if(!this.event[name]){
+                    this.event[name]=[]
+                }
+                this.event[name].push(func)
+            }
+            off(name){
+                if(this.event[name]){
+                    delete this.event[name]
+                }
+            }
+            emit(name,...args){
+                if(this.event[name]){
+                    this.event[name].forEach(func=>[
+                        func(...args)
+                    ])
+                }
+            }
+        }
+
+        function binary(arr,target){
+            let left = 0
+            let right = arr.length - 1
+            while(left <= right){
+                mid = Math.floor((left+right)/2)
+                if( target === a[mid] ){
+                    return mid
+                }else if(target > a[mid]){
+                    left = mid + 1
+                }else{
+                    right = mid - 1
+                }
+            }
+            return -1
+        }
+
+        function flatArray(arr){
+            let result = []
+            for(let i = 0;i < arr.length-1 ;i++){
+                if(Array.isArray(arr[i])){
+                    result = result.concat(flatArray(arr[i]))
+                }else{
+                    result.push(arr[i])
+                }
+            }
+            return result
+        }
+
+        class ListNode{
+            constructor(val,next = null){
+                this.val = val
+                this.next = next
+            }
+        }
+        function deleteRepeatNode(head){
+            let cur = head
+            while(cur !== null && cur.next !== null){
+                if(cur.val === cur.next.val){
+                    cur.next = cur.next.next
+                }else{
+                    cur = cur.next
+                }
+            }
+            return head
+        }
+        function deleteRepeatNode2(head){
+            if(!head || !head.next){
+                return head
+            }                
+            const valueCountMap = new Map()
+            let cur = head
+            while(cur){
+                if(valueCountMap.has(cur.val)){
+                    valueCountMap.set(cur.val,valueCountMap.get(cur.val)+1)
+                }else{
+                    valueCountMap.set(cur.val,1)
+                }
+                cur = cur.next
+            }
+            const dummy = new ListNode()
+            dummy.next = head
+            cur = dummy
+
+            while(cur && cur.next){
+                if(valueCountMap.get(cur.next.val) > 1){
+                    cur.next = cur.next.next
+                }else{
+                    cur = cur.next
+                }
+            }
+            return dummy.next
+
+
+        }
+
+        function findMax(str){
+            if(!str){
+                return ''
+            }
+            let maxSubstr = ''
+            let curSubstr = str[0]
+
+            for(let i = 0; i < str.length; i++){
+                if(str[i] > str[i - 1]){
+                    curSubstr =+ str[i]
+                }else{
+                    if(curSubstr.length > maxSubstr.length){
+                        maxSubstr = curSubstr
+                    }
+                    curSubstr = str[i]
+                }
+            }
+            if(curSubstr.length > maxSubstr.length){
+                maxSubstr = curSubstr
+            }
+            return maxSubstr
+        }
+
+        class tree{
+            constructor(val,left,right){
+                this.left = null
+                this.right = null
+                this.val = val
+            }
+        }
+
+        function dfs(root){
+            if(!root){
+                return 
+            }
+            console.log(root.val);
+            dfs(root.left)
+            dfs(root.right)
+        }
+
+        function bfs(root){
+
+            if(!root){
+                return
+            }
+            let result = []
+            let queue = [root]
+            while(queue.length > 0 ){
+                const node = queue.shift()
+                result.push(node.val)
+                if(node.left){
+                    queue.push(node.left)
+                }
+                if(node.right){
+                    queue.push(node.right)
+                }
+            }
+        }
+
+        function findMaxTreeNode(root){
+            let maxSum = -Infinity
+
+            function dfs(node){
+                if(!node){
+                    return
+                }
+                const leftSum = Math.max(dfs(node.left),0)
+                const rightSum = Math.max(dfs(node.right),0)
+
+                const pathSum = node.val + leftSum + rightSum
+                maxSum = Math.max(maxSum,pathSum)
+                return node.val + Math.max(leftSum,rightSum)
+            }
+            dfs(root)
+
+            return maxSum
+        }
+
+        function findMaxTreeNodeFromRoot(root){
+            if(!root){
+                return
+            }
+            let maxSum = -Infinity
+            function dfs(node,curSum){
+                if(!node){
+                    return
+                }
+                curSum += node.val
+                if(!node.left &&!node.right){
+                    maxSum = Math.max(maxSum,curSum)
+                    return
+                }
+                dfs(node.left,curSum)
+                dfs(node.right,curSum)
+            }
+            dfs(root,0)
+
+            return maxSum
+        }
+
+        function findPathTarget(root,target){
+            const path = []
+            function dfs(node,path,curSum){
+                if(!node){
+                    return
+                }
+                curSum += node.val
+                path.push(node.val)
+
+                if(!node.left && !node.right && curSum === target){
+                    path.push([...path])
+                }
+                dfs(node.left,path,curSum)
+                dfs(node.right,path,curSum)
+
+                path.pop()
+            }
+            dfs(node,[],0)
+
+            return path
+        }
+
+
+
+
+
+        </script>
+</body>
+</html>
