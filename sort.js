@@ -108,3 +108,37 @@ function binary(arr,target){
     }
     return -1
 }
+
+// 数组乱序算法
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// 合并有序数组
+function mergeSortedArrays(nums1, m, nums2, n) {
+  let p1 = m - 1; // 指向 nums1 末尾
+  let p2 = n - 1; // 指向 nums2 末尾
+  let p = m + n - 1; // 合并后数组的末尾索引
+
+  while (p1 >= 0 && p2 >= 0) {
+      if (nums1[p1] > nums2[p2]) {
+          nums1[p] = nums1[p1];
+          p1--;
+      } else {
+          nums1[p] = nums2[p2];
+          p2--;
+      }
+      p--;
+  }
+
+  // 将剩余的 nums2 元素合并到 nums1 中
+  while (p2 >= 0) {
+      nums1[p] = nums2[p2];
+      p2--;
+      p--;
+  }
+}

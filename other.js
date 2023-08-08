@@ -87,3 +87,66 @@ function findMax(str){
     }
     return maxSubstr
 }
+
+// 全排列
+function permute(nums) {
+    const result = [];
+    
+    function backtrack(start) {
+      if (start === nums.length) {
+        result.push([...nums]);
+        return;
+      }
+      
+      for (let i = start; i < nums.length; i++) {
+        // Swap current element with the element at index 'start'
+        [nums[start], nums[i]] = [nums[i], nums[start]];
+        backtrack(start + 1); // Recursive call
+        // Restore the original order
+        [nums[start], nums[i]] = [nums[i], nums[start]];
+      }
+    }
+    
+    backtrack(0);
+    return result;
+  }
+  
+//   const nums = [1, 2, 3];
+//   const permutations = permute(nums);
+//   console.log(permutations);
+
+//   最大子序和
+function maxSubArray(nums) {
+    if (!nums || nums.length === 0) {
+      return 0;
+    }
+  
+    let maxSum = nums[0]; // 最大子序和
+    let currentSum = nums[0]; // 当前子序和
+  
+    for (let i = 1; i < nums.length; i++) {
+      // 如果当前子序和小于0，则从当前元素重新开始计算子序和
+      currentSum = Math.max(nums[i], currentSum + nums[i]);
+      // 更新最大子序和
+      maxSum = Math.max(maxSum, currentSum);
+    }
+  
+    return maxSum;
+  }
+  
+//   // 示例用法
+//   const nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4];
+//   const result = maxSubArray(nums);
+//   console.log(result); // 输出 6，对应子序列 [4, -1, 2, 1]
+  
+//   数组去重
+function uniqueUsingIndexOf(arr) {
+    const result = [];
+    for (let i = 0; i < arr.length; i++) {
+      if (result.indexOf(arr[i]) === -1) {
+        result.push(arr[i]);
+      }
+    }
+    return result;
+  }
+  

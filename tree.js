@@ -98,3 +98,94 @@ function findPathTarget(root,target){
 
     return path
 }
+
+// 二叉平衡树
+class TreeNode {
+    constructor(val) {
+        this.val = val;
+        this.left = null;
+        this.right = null;
+        this.height = 1;
+    }
+}
+
+class AVLTree {
+    constructor() {
+        this.root = null;
+    }
+
+    getHeight(node) {
+        return node ? node.height : 0;
+    }
+
+    getBalanceFactor(node) {
+        return node ? this.getHeight(node.left) - this.getHeight(node.right) : 0;
+    }
+
+    rotateLeft(node) {
+        const newRoot = node.right;
+        node.right = newRoot.left;
+        newRoot.left = node;
+        node.height = Math.max(this.getHeight(node.left), this.getHeight(node.right)) + 1;
+        newRoot.height = Math.max(this.getHeight(newRoot.left), this.getHeight(newRoot.right)) + 1;
+        return newRoot;
+    }
+
+    rotateRight(node) {
+        const newRoot = node.left;
+        node.left = newRoot.right;
+        newRoot.right = node;
+        node.height = Math.max(this.getHeight(node.left), this.getHeight(node.right)) + 1;
+        newRoot.height = Math.max(this.getHeight(newRoot.left), this.getHeight(newRoot.right)) + 1;
+        return newRoot;
+    }
+
+    insert(val, node = this.root) {
+        if (!node) {
+            return new TreeNode(val);
+        }
+
+        if (val < node.val) {
+            node.left = this.insert(val, node.left);
+        } else if (val > node.val) {
+            node.right = this.insert(val, node.right);
+        } else {
+            // 重复值不插入
+            return node;
+        }
+
+        node.height = Math.max(this.getHeight(node.left), this.getHeight(node.right)) + 1;
+        const balanceFactor = this.getBalanceFactor(node);
+
+        // 左子树高度大于右子树
+        if (balanceFactor > 1 && val < node.left.val) {
+            return this.rotateRight(node);
+        }
+
+        // 右子树高度大于左子树
+        if (balanceFactor < -1 && val > node.right.val) {
+            return this.rotateLeft(node);
+        }
+
+        // 左右子树高度差超过1
+        if (balanceFactor > 1 && val > node.left.val) {
+            node.left = this.rotateLeft(node.left);
+            return this.rotateRight(node);
+        }
+
+        // 右左子树高度差超过1
+        if (balanceFactor < -1 && val < node.right.val) {
+            node.right = this.rotateRight(node.right);
+            return this.rotateLeft(node);
+        }
+
+        return node;
+    }
+}
+
+// // 示例
+// const avlTree = new AVLTree();
+// avlTree.root = avlTree.insert(10);
+// avlTree.root = avlTree.insert(20);
+// avlTree.root = avlTree.insert(30);
+// console.log(avlTree.root); // 输出 AVLTree 的根节点
