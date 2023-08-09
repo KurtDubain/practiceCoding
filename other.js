@@ -74,7 +74,7 @@ function findMax(str){
 
     for(let i = 0; i < str.length; i++){
         if(str[i] > str[i - 1]){
-            curSubstr =+ str[i]
+            curSubstr += str[i]
         }else{
             if(curSubstr.length > maxSubstr.length){
                 maxSubstr = curSubstr
@@ -85,6 +85,7 @@ function findMax(str){
     if(curSubstr.length > maxSubstr.length){
         maxSubstr = curSubstr
     }
+    
     return maxSubstr
 }
 
@@ -99,10 +100,8 @@ function permute(nums) {
       }
       
       for (let i = start; i < nums.length; i++) {
-        // Swap current element with the element at index 'start'
         [nums[start], nums[i]] = [nums[i], nums[start]];
-        backtrack(start + 1); // Recursive call
-        // Restore the original order
+        backtrack(start + 1); 
         [nums[start], nums[i]] = [nums[i], nums[start]];
       }
     }

@@ -6,18 +6,17 @@ function reverse(head){
     let pre = null
     let cur = head
     while(cur){
-        let next = head.next
+        let next = cur.next
         cur.next = pre
         pre = cur
         cur = next
-
     }
     return pre
 }
 
 function isPail( head ) {
     // 判断当前链表的节点数量是否过短
-    if(!head || !head.text){return true}
+    if(!head || !head.next){return true}
     let slow = head
     let fast = head
     // 截取中间的链表
@@ -27,7 +26,6 @@ function isPail( head ) {
     }
     // 翻转后半段链表
     let backArrayReverse = reverse(slow.next)
-
     let p1 = head
     let p2 = backArrayReverse
     // 对两个链表逐次判断是否相同，如果全都相同则为回文链表
@@ -38,10 +36,7 @@ function isPail( head ) {
         p1 = p1.next
         p2 = p2.next
     }
-
     return true
-    
-
 }
 
 class ListNode{

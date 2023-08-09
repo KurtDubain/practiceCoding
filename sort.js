@@ -5,10 +5,10 @@ function quickSort(arr) {
     if (arr.length <= 1) {
       return arr;
     }
-    const pivot = arr[arr.length - 1];
+    const pivot = arr[Math.floor(Math.random()*arr.length)]
     const left = [];
     const right = [];
-    for (let i = 0; i < arr.length - 1; i++) {
+    for (let i = 0; i < arr.length; i++) {
       if (arr[i] < pivot) {
         left.push(arr[i]);
       } else {
@@ -142,3 +142,32 @@ function mergeSortedArrays(nums1, m, nums2, n) {
       p--;
   }
 }
+
+function fn1(a,b){
+  console.log('hahaha',b);
+  return{
+    innerFn:function(c){
+      return fn1(c,a)
+    }
+  }
+}
+
+fn1(1).innerFn(2).innerFn(3).innerFn(4)
+
+function fn2(a,b){
+  console.log('heihie',b);
+  return{
+    fn2:function(c){
+      return fn2(c,a)
+    }
+  }
+}
+
+let a = fn2(1)
+a.fn2(2)
+a.fn2(3)
+a.fn2(4)
+
+let b = fn2().fn2(2)
+b.fn2(3).fn2(4)
+b.fn2(5).fn2(6)

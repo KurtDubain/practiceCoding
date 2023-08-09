@@ -10,7 +10,7 @@ class tree{
 // 深度优先遍历
 function dfs(root){
     if(!root){
-        return 
+        return
     }
     console.log(root.val);
     dfs(root.left)
@@ -18,7 +18,6 @@ function dfs(root){
 }
 // 广度优先遍历
 function bfs(root){
-
     if(!root){
         return
     }
@@ -51,7 +50,6 @@ function findMaxTreeNode(root){
         return node.val + Math.max(leftSum,rightSum)
     }
     dfs(root)
-
     return maxSum
 }
 // 寻找从根节点出发的最大路径
