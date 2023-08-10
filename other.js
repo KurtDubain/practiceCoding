@@ -148,4 +148,41 @@ function uniqueUsingIndexOf(arr) {
     }
     return result;
   }
+//   千分位分隔符
+  function formatNumberWithCommas(number) {
+    if (typeof number !== 'number') {
+      return number; // 返回原值，或者抛出异常
+    }
   
+    const strNumber = number.toString();
+    const parts = strNumber.split('.');
+    let integerPart = parts[0];
+    const decimalPart = parts[1] || '';
+  
+    // 对整数部分添加逗号
+    let formattedInteger = '';
+    let count = 0;
+    for (let i = integerPart.length - 1; i >= 0; i--) {
+      formattedInteger = integerPart[i] + formattedInteger;
+      count++;
+      if (count === 3 && i > 0) {
+        formattedInteger = ',' + formattedInteger;
+        count = 0;
+      }
+    }
+  
+    // 合并整数和小数部分
+    const formattedNumber = decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+  
+    return formattedNumber;
+  }
+// 数组扁平并排序去重
+  function flattenAndSort(arr) {
+    // 将嵌套数组拍平
+    const flatArray = arr.reduce((result, current) => result.concat(current), []);
+  
+    // 排序并去重
+    const sortedAndUnique = Array.from(new Set(flatArray)).sort((a, b) => a - b);
+  
+    return sortedAndUnique;
+  }

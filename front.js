@@ -101,3 +101,64 @@ function debounce(func,delay){
         },delay)
     }
 }
+// new的原生实现
+function myNew(constructor, ...args) {
+  const newObj = Object.create(constructor.prototype);
+  const result = constructor.apply(newObj, args);
+  return result instanceof Object ? result : newObj;
+}
+
+// call的原生实现
+Function.prototype.myCall = function(context, ...args) {
+  context = context || window;
+  const fn = Symbol('fn');
+  context[fn] = this;
+  const result = context[fn](...args);
+  delete context[fn];
+  return result;
+};
+
+// 示例
+// function greet(name) {
+//   console.log(`Hello, ${name}! My name is ${this.name}.`);
+// }
+
+// const person = { name: 'Alice' };
+// greet.myCall(person, 'Bob'); // 输出: Hello, Bob! My name is Alice.
+
+
+// bind的原生实现
+Function.prototype.myBind = function(context, ...args) {
+  const fn = this;
+  return function(...newArgs) {
+    return fn.apply(context, args.concat(newArgs));
+  };
+};
+
+// 示例
+// function greet(name) {
+//   console.log(`Hello, ${name}! My name is ${this.name}.`);
+// }
+
+// const person = { name: 'Alice' };
+// const boundGreet = greet.myBind(person, 'Bob');
+// boundGreet('Charlie'); // 输出: Hello, Bob! My name is Alice.
+
+
+// apply的原生实现
+Function.prototype.myApply = function(context, args = []) {
+  context = context || window;
+  const fn = Symbol('fn');
+  context[fn] = this;
+  const result = context[fn](...args);
+  delete context[fn];
+  return result;
+};
+
+// 示例
+// function greet(name) {
+//   console.log(`Hello, ${name}! My name is ${this.name}.`);
+// }
+
+// const person = { name: 'Alice' };
+// greet.myApply(person, ['Bob']); // 输出: Hello, Bob! My name is Alice.
