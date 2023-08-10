@@ -23,3 +23,18 @@ class Eventbus{
         }
     }
 }
+
+// 自定义指令对象
+const myDirective = {
+    // 当被绑定的元素插入到 DOM 中时
+    inserted(el) {
+      el.focus(); // 当插入到 DOM 中时，自动聚焦元素
+    },
+    // 当绑定元素的值更新时
+    update(el, binding) {
+      el.style.backgroundColor = binding.value; // 更新元素的背景颜色
+    },
+  };
+  
+  export default myDirective;
+  
