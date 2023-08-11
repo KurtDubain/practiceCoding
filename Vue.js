@@ -37,4 +37,17 @@ const myDirective = {
   };
   
   export default myDirective;
+  // 全局注册
+// import Vue from 'vue';
+// import myDirective from './myDirective';
+
+// Vue.directive('my-directive', myDirective);
+
+// // 局部注册
+// export default {
+//   directives: {
+//     myDirective,
+//   },
+// };
+
   

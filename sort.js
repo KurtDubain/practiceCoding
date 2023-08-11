@@ -143,31 +143,17 @@ function mergeSortedArrays(nums1, m, nums2, n) {
   }
 }
 
-function fn1(a,b){
-  console.log('hahaha',b);
-  return{
-    innerFn:function(c){
-      return fn1(c,a)
+// 找出数组中非最大数字的个数
+function countNotNum(arr){
+  if(arr.length <= 1){
+    return 0
+  }
+  let maxNum = Math.max(...arr)
+  let count = 0
+  for(let i = 0; i < arr.length ; i++){
+    if(a[i] !== maxNum){
+      count ++
     }
   }
+  return count
 }
-
-fn1(1).innerFn(2).innerFn(3).innerFn(4)
-
-function fn2(a,b){
-  console.log('heihie',b);
-  return{
-    fn2:function(c){
-      return fn2(c,a)
-    }
-  }
-}
-
-let a = fn2(1)
-a.fn2(2)
-a.fn2(3)
-a.fn2(4)
-
-let b = fn2().fn2(2)
-b.fn2(3).fn2(4)
-b.fn2(5).fn2(6)
