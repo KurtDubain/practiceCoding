@@ -162,3 +162,26 @@ Function.prototype.myApply = function(context, args = []) {
 
 // const person = { name: 'Alice' };
 // greet.myApply(person, ['Bob']); // 输出: Hello, Bob! My name is Alice.
+function mySetInterval(fn, interval) {
+  let timerId;
+
+  function intervalFn() {
+    fn(); // 执行传入的函数
+    timerId = setTimeout(intervalFn, interval); // 递归调用自身
+  }
+
+  timerId = setTimeout(intervalFn, interval); // 第一次调用
+  return function() {
+    clearTimeout(timerId); // 返回一个函数用于清除定时器
+  };
+}
+
+// 测试
+const cancelInterval = mySetInterval(() => {
+  console.log('Interval function');
+}, 1000);
+
+// 运行一段时间后，手动取消定时器
+setTimeout(() => {
+  cancelInterval(); // 清除定时器
+}, 5000);
