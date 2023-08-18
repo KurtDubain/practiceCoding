@@ -50,4 +50,48 @@ const myDirective = {
 //   },
 // };
 
+  // 手写 Promise.all
+function customPromiseAll(promises) {
+    return new Promise((resolve, reject) => {
+      const results = [];
+      let completedCount = 0;
+  
+      for (let i = 0; i < promises.length; i++) {
+        promises[i]
+          .then(result => {
+            results[i] = result;
+            completedCount++;
+            
+            if (completedCount === promises.length) {
+              resolve(results);
+            }
+          })
+          .catch(reject);
+      }
+    });
+  }
+  
+  // 手写 Promise.race
+  function customPromiseRace(promises) {
+    return new Promise((resolve, reject) => {
+      for (let i = 0; i < promises.length; i++) {
+        promises[i]
+          .then(resolve)
+          .catch(reject);
+      }
+    });
+  }
+  
+//   // 测试
+//   const promise1 = new Promise(resolve => setTimeout(() => resolve("Promise 1"), 1000));
+//   const promise2 = new Promise(resolve => setTimeout(() => resolve("Promise 2"), 500));
+//   const promise3 = new Promise((resolve, reject) => setTimeout(() => reject("Promise 3 Error"), 800));
+  
+//   customPromiseAll([promise1, promise2])
+//     .then(results => console.log("Promise.all:", results))
+//     .catch(error => console.error("Promise.all Error:", error));
+  
+//   customPromiseRace([promise1, promise2, promise3])
+//     .then(result => console.log("Promise.race:", result))
+//     .catch(error => console.error("Promise.race Error:", error));
   

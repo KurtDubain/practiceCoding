@@ -177,11 +177,100 @@ function mySetInterval(fn, interval) {
 }
 
 // 测试
-const cancelInterval = mySetInterval(() => {
-  console.log('Interval function');
-}, 1000);
+// const cancelInterval = mySetInterval(() => {
+//   console.log('Interval function');
+// }, 1000);
 
-// 运行一段时间后，手动取消定时器
-setTimeout(() => {
-  cancelInterval(); // 清除定时器
-}, 5000);
+// // 运行一段时间后，手动取消定时器
+// setTimeout(() => {
+//   cancelInterval(); // 清除定时器
+// }, 5000);
+
+function myPromiseAll(promises) {
+  return new Promise((resolve, reject) => {
+    if (!Array.isArray(promises)) {
+      return reject(new TypeError('promises must be an array'));
+    }
+
+    const results = [];
+    let completedCount = 0;
+
+    for (let i = 0; i < promises.length; i++) {
+      promises[i]
+        .then((result) => {
+          results[i] = result;
+          completedCount++;
+
+          if (completedCount === promises.length) {
+            resolve(results);
+          }
+        })
+        .catch(reject);
+    }
+  });
+}
+
+// 测试
+// const promise1 = Promise.resolve(1);
+// const promise2 = new Promise((resolve) => setTimeout(() => resolve(2), 1000));
+// const promise3 = Promise.reject('Error');
+
+// myPromiseAll([promise1, promise2, promise3])
+//   .then((results) => {
+//     console.log('All promises resolved:', results);
+//   })
+//   .catch((error) => {
+//     console.error('Error:', error);
+//   });
+
+class AsyncQueue {
+  constructor(concurrency) {
+    this.concurrency = concurrency;
+    this.tasks = [];
+    this.runningCount = 0;
+  }
+
+  enqueue(task) {
+    return new Promise((resolve, reject) => {
+      this.tasks.push({ task, resolve, reject });
+      this.runTasks();
+    });
+  }
+
+  runTasks() {
+    while (this.runningCount < this.concurrency && this.tasks.length > 0) {
+      const { task, resolve, reject } = this.tasks.shift();
+      this.runningCount++;
+
+      task()
+        .then((result) => {
+          this.runningCount--;
+          resolve(result);
+          this.runTasks();
+        })
+        .catch((error) => {
+          this.runningCount--;
+          reject(error);
+          this.runTasks();
+        });
+    }
+  }
+}
+
+// // 测试
+// const asyncQueue = new AsyncQueue(2);
+
+// const delay = (ms, value) =>
+//   new Promise((resolve) => setTimeout(() => resolve(value), ms));
+
+// asyncQueue.enqueue(() => delay(1000, 'Task 1'))
+//   .then((result) => console.log(result))
+//   .catch((error) => console.error(error));
+
+// asyncQueue.enqueue(() => delay(1500, 'Task 2'))
+//   .then((result) => console.log(result))
+//   .catch((error) => console.error(error));
+
+// asyncQueue.enqueue(() => delay(500, 'Task 3'))
+//   .then((result) => console.log(result))
+//   .catch((error) => console.error(error));

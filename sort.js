@@ -157,3 +157,55 @@ function countNotNum(arr){
   }
   return count
 }
+
+function sortColors(nums) {
+  let low = 0;
+  let high = nums.length - 1;
+  let i = 0;
+
+  while (i <= high) {
+    if (nums[i] === 0) {
+      [nums[i], nums[low]] = [nums[low], nums[i]];
+      low++;
+      i++;
+    } else if (nums[i] === 1) {
+      i++;
+    } else if (nums[i] === 2) {
+      [nums[i], nums[high]] = [nums[high], nums[i]];
+      high--;
+    }
+  }
+}
+
+// 测试
+// const colors = [2, 0, 2, 1, 1, 0];
+// sortColors(colors);
+// console.log(colors); // 输出 [0, 0, 1, 1, 2, 2]
+
+function nextGreaterElement(nums1, nums2) {
+  const result = [];
+  const stack = [];
+
+  const map = new Map();
+
+  // 遍历 nums2，将每个元素与它的下一个更大元素建立映射关系
+  for (let i = 0; i < nums2.length; i++) {
+    while (stack.length > 0 && nums2[i] > stack[stack.length - 1]) {
+      map.set(stack.pop(), nums2[i]);
+    }
+    stack.push(nums2[i]);
+  }
+
+  // 遍历 nums1，根据映射关系找到下一个更大元素
+  for (let i = 0; i < nums1.length; i++) {
+    result.push(map.get(nums1[i]) || -1);
+  }
+
+  return result;
+}
+
+// // 测试
+// const nums1 = [4, 1, 2];
+// const nums2 = [1, 3, 4, 2];
+// const result = nextGreaterElement(nums1, nums2);
+// console.log(result); // 输出 [ 3, -1, -1 ]
