@@ -169,3 +169,49 @@ function isPredecessor(word1, word2) {
 
 const words = ["a", "b", "ba", "bca", "bda", "bdca"];
 console.log(longestStrChain(words)); // 输出 4
+
+// 最长递增子序列
+function findMaxLength(arr){
+  if(arr.length <= 1 ){
+      return arr.length
+  }
+
+  let dp = new Array(arr.length).fill(1)
+  let maxLength = 1
+  for(let i = 1; i < arr.length; i++){
+      for(let j = 0; j < i; j++){
+          if(arr[i] > arr[j]){
+              dp[i] = Math.max(dp[i], dp[j] + 1)
+          }
+      }
+      maxLength = Math.max(maxLength, dp[i])
+      
+  }
+  return maxLength
+
+}
+
+const arr = [10,9,2,5,3,7,101,18]
+console.log(findMaxLength(arr))
+
+// 小A和小B拿到两个正整数x，y，他俩可以轮流对x+=1或x*=2，小A先手，谁的操作使得x>=y就算谁赢，小A赢则输出Awin，否则输出Bwin，js实现泛
+function solve(x, y) {
+  const dp = Array.from({length: y+1}, () => Array(y+1).fill(0));
+
+  for (let j = y; j >= x; j--) {
+      for (let i = j; i >= x; i--) {
+          if (i >= j) {
+              dp[i][j] = 1;
+          } else {
+              if (2*i >= j || dp[2*i][j] === 0) {
+                  dp[i][j] = 1;
+              }
+              else if (i+1 >= j || dp[i+1][j] === 0) {
+                  dp[i][j] = 1;
+              }
+          }
+      }
+  }
+
+  return dp[x][y] === 1 ? 'AWin' : 'BWin';
+}

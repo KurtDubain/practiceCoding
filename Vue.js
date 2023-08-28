@@ -95,3 +95,70 @@ function customPromiseAll(promises) {
 //     .then(result => console.log("Promise.race:", result))
 //     .catch(error => console.error("Promise.race Error:", error));
   
+// diff算法
+function diffArrays(oldArray, newArray) {
+  const patches = [];
+
+  function compareArrays(oldArr, newArr, path = '') {
+      if (!Array.isArray(oldArr) || !Array.isArray(newArr)) {
+          if (oldArr !== newArr) {
+              patches.push(`Change ${path}: ${oldArr} => ${newArr}`);
+          }
+          return;
+      }
+
+      for (let i = 0; i < Math.max(oldArr.length, newArr.length); i++) {
+          const oldItem = oldArr[i];
+          const newItem = newArr[i];
+
+          const itemPath = path + `[${i}]`;
+
+          if (i >= oldArr.length) {
+              patches.push(`Add ${itemPath}: ${newItem}`);
+          } else if (i >= newArr.length) {
+              patches.push(`Remove ${itemPath}: ${oldItem}`);
+          } else {
+              compareArrays(oldItem, newItem, itemPath);
+          }
+      }
+  }
+
+  compareArrays(oldArray, newArray);
+  return patches;
+}
+
+const oldArray = ['a', 'b', 'c', 'd'];
+const newArray = ['b', 'a', 'd', 'e', 'f'];
+const changes = diffArrays(oldArray, newArray);
+// console.log(changes);
+
+function diffObjects(oldObj, newObj, path = '') {
+  const patches = [];
+
+  function compareValues(oldVal, newVal, path) {
+      if (typeof oldVal === 'object' && oldVal !== null && typeof newVal === 'object' && newVal !== null) {
+          compareObjects(oldVal, newVal, path);
+      } else if (oldVal !== newVal) {
+          patches.push(`Change ${path}: ${oldVal} => ${newVal}`);
+      }
+  }
+
+  function compareObjects(oldObj, newObj, path) {
+      const allKeys = new Set([...Object.keys(oldObj), ...Object.keys(newObj)]);
+      for (const key of allKeys) {
+          const oldVal = oldObj[key];
+          const newVal = newObj[key];
+          const newPath = path ? `${path}.${key}` : key;
+          if (!(key in oldObj)) {
+              patches.push(`Add ${newPath}: ${newVal}`);
+          } else if (!(key in newObj)) {
+              patches.push(`Remove ${newPath}: ${oldVal}`);
+          } else {
+              compareValues(oldVal, newVal, newPath);
+          }
+      }
+  }
+
+  compareObjects(oldObj, newObj, path);
+  return patches;
+}
