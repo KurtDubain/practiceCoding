@@ -187,3 +187,26 @@ class AVLTree {
 // avlTree.root = avlTree.insert(20);
 // avlTree.root = avlTree.insert(30);
 // console.log(avlTree.root); // 输出 AVLTree 的根节点
+function bfs(root) {
+    if (!root) {
+      return;
+    }
+    let result = [];
+    let queue = [root];
+    while (queue.length > 0) {
+      const levelSize = queue.length;
+      let currentLevel = [];
+      for (let i = 0; i < levelSize; i++) {
+        const node = queue.shift();
+        currentLevel.push(node.val);
+        if (node.left) {
+          queue.push(node.left);
+        }
+        if (node.right) {
+          queue.push(node.right);
+        }
+      }
+      result.push(currentLevel);
+    }
+    return result;
+  }

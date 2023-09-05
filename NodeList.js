@@ -87,3 +87,127 @@ function deleteRepeatNode2(head){
 
 
 }
+
+
+// class ListNode {
+//     constructor(val, next = null) {
+//       this.val = val;
+//       this.next = next;
+//     }
+//   }
+// 链表排序
+  
+  function mergeSortLinkedList(head) {
+    if (!head || !head.next) {
+      return head; // 链表为空或只有一个节点，直接返回
+    }
+  
+    // 划分子问题，找到链表的中间节点
+    let slow = head;
+    let fast = head;
+    let prev = null;
+  
+    while (fast && fast.next) {
+      prev = slow;
+      slow = slow.next;
+      fast = fast.next.next;
+    }
+  
+    prev.next = null; // 断开链表，分成两个子链表
+  
+    // 递归地对两个子链表进行排序
+    const left = mergeSortLinkedList(head);
+    const right = mergeSortLinkedList(slow);
+  
+    // 合并两个有序子链表
+    return merge(left, right);
+  }
+  
+  function merge(left, right) {
+    const dummy = new ListNode(0); // 哨兵节点
+    let current = dummy;
+  
+    while (left && right) {
+      if (left.val <= right.val) {
+        current.next = left;
+        left = left.next;
+      } else {
+        current.next = right;
+        right = right.next;
+      }
+      current = current.next;
+    }
+  
+    // 处理剩余的节点
+    if (left) {
+      current.next = left;
+    }
+    if (right) {
+      current.next = right;
+    }
+  
+    return dummy.next; // 返回合并后的链表
+  }
+
+
+  // 定义二叉树节点，先序遍历二叉树构建链表
+class TreeNode {
+    constructor(val) {
+      this.val = val;
+      this.left = null;
+      this.right = null;
+    }
+  }
+  
+  // 构造二叉树
+  function constructTree() {
+    const root = new TreeNode(1);
+    root.left = new TreeNode(2);
+    root.right = new TreeNode(3);
+    root.left.left = new TreeNode(4);
+    root.left.right = new TreeNode(5);
+    root.right.left = new TreeNode(6);
+    root.right.right = new TreeNode(7);
+    return root;
+  }
+  
+  // 先序遍历二叉树，并构造链表
+  function preorderTraversal(root) {
+    if (!root) return null;
+  
+    const stack = [];
+    const dummy = new ListNode(-1); // 链表的哑节点
+    let current = dummy;
+  
+    stack.push(root);
+  
+    while (stack.length) {
+      const node = stack.pop();
+      current.next = new ListNode(node.val);
+      current = current.next;
+  
+      if (node.right) stack.push(node.right);
+      if (node.left) stack.push(node.left);
+    }
+  
+    return dummy.next;
+  }
+  
+//   // 定义链表节点
+//   class ListNode {
+//     constructor(val) {
+//       this.val = val;
+//       this.next = null;
+//     }
+//   }
+  
+//   // 测试
+//   const root = constructTree();
+//   const linkedList = preorderTraversal(root);
+  
+//   // 打印链表结果
+//   let current = linkedList;
+//   while (current) {
+//     console.log(current.val);
+//     current = current.next;
+//   }

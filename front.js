@@ -274,3 +274,26 @@ class AsyncQueue {
 // asyncQueue.enqueue(() => delay(500, 'Task 3'))
 //   .then((result) => console.log(result))
 //   .catch((error) => console.error(error));
+
+// 循环引用判断
+function hasCircularReference(obj) {
+  let seen = new WeakSet();
+
+  function detect(obj) {
+    if (typeof obj === 'object' && obj !== null) {
+      if (seen.has(obj)) {
+        return true; // 循环引用
+      }
+      seen.add(obj);
+      for (let key in obj) {
+        if (detect(obj[key])) {
+          return true; // 循环引用
+        }
+      }
+      seen.delete(obj);
+    }
+    return false;
+  }
+
+  return detect(obj);
+}
