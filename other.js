@@ -371,3 +371,73 @@ function jumpFloor2(n) {
     return dp[n];
   }
 }
+
+// 01相邻矩阵判断
+function findMinOperations(matrix) {
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  let minOperations = Infinity;
+
+  for (let startWithZero = 0; startWithZero <= 1; startWithZero++) {
+      let operations = 0;
+
+      for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+              const expected = (i + j) % 2 === startWithZero ? '0' : '1';
+
+              if (matrix[i][j] !== expected) {
+                  operations++;
+              }
+          }
+      }
+
+      minOperations = Math.min(minOperations, operations);
+  }
+
+  return minOperations;
+}
+
+
+// 迭代器对象实现对Object中for of遍历键值的实现
+let testObj = {
+  a: 1,
+  b: 2,
+  c: 3
+};
+
+testObj[Symbol.iterator] = function() {
+  let keys = Object.keys(this);
+  let index = 0;
+
+  return {
+    next: () => {
+      if (index < keys.length) {
+        let key = keys[index];
+        let value = this[key];
+        index++;
+        return { value: [key, value], done: false };
+      } else {
+        return { done: true };
+      }
+    }
+  };
+};
+
+for (const [key, value] of testObj) {
+  console.log(key, value);
+}
+// 最小次数实现元素不重复
+function minAddOneOperationsToMakeUnique(arr) {
+  const uniqueSet = new Set();
+  let operations = 0;
+
+  for (const num of arr) {
+      while (uniqueSet.has(num)) {
+          num++;
+          operations++;
+      }
+      uniqueSet.add(num);
+  }
+
+  return operations;
+}

@@ -162,3 +162,47 @@ function diffObjects(oldObj, newObj, path = '') {
   compareObjects(oldObj, newObj, path);
   return patches;
 }
+
+// Vnode使用render函数将Vnode渲染成真实dom
+class VNode {
+  constructor(tagName, props, children) {
+      this.tagName = tagName;
+      this.props = props;
+      this.children = children;
+  }
+
+  render() {
+      const element = document.createElement(this.tagName);
+
+      // 设置元素属性
+      if (this.props) {
+          for (const propName in this.props) {
+              element.setAttribute(propName, this.props[propName]);
+          }
+      }
+
+      // 递归渲染子节点
+      if (this.children) {
+          for (const child of this.children) {
+              if (child instanceof VNode) {
+                  // 如果子节点是 VNode 对象，则递归渲染并附加到当前元素
+                  element.appendChild(child.render());
+              } else {
+                  // 否则，假设子节点是文本节点
+                  element.appendChild(document.createTextNode(child));
+              }
+          }
+      }
+
+      return element;
+  }
+}
+
+// 示例用法
+const vnode = new VNode('div', { class: 'container' }, [
+  new VNode('h1', null, ['Hello, World!']),
+  new VNode('p', null, ['This is a paragraph.']),
+]);
+
+const domElement = vnode.render();
+document.body.appendChild(domElement);

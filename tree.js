@@ -210,3 +210,19 @@ function bfs(root) {
     }
     return result;
   }
+
+// 输入中序遍历和后续遍历的结果，构造树
+  function buildTree(inorder, postorder) {
+    if (inorder.length === 0 || postorder.length === 0) {
+      return null;
+    }
+  
+    const rootVal = postorder.pop();
+    const root = new TreeNode(rootVal);
+    const rootIndexInorder = inorder.indexOf(rootVal);
+  
+    root.right = buildTree(inorder.slice(rootIndexInorder + 1), postorder);
+    root.left = buildTree(inorder.slice(0, rootIndexInorder), postorder);
+  
+    return root;
+  }
