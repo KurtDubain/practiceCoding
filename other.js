@@ -426,6 +426,15 @@ testObj[Symbol.iterator] = function() {
 for (const [key, value] of testObj) {
   console.log(key, value);
 }
+
+Object.prototype[Symbol.iterator]=function*(){
+  for(let key in this){
+    if(this.hasOwnProperty(key)){
+      yield[key,this[key]]
+    }
+  }
+}
+
 // 最小次数实现元素不重复
 function minAddOneOperationsToMakeUnique(arr) {
   const uniqueSet = new Set();
