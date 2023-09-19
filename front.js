@@ -297,3 +297,29 @@ function hasCircularReference(obj) {
 
   return detect(obj);
 }
+function deepCopy(obj, visited = new Map()) {
+  // 如果是基本数据类型或者 null，则直接返回
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  // 检查是否已经拷贝过该对象
+  if (visited.has(obj)) {
+    return visited.get(obj);
+  }
+
+  // 创建新的对象或数组
+  const clone = Array.isArray(obj) ? [] : {};
+
+  // 记录已经拷贝过的对象，以便处理循环引用
+  visited.set(obj, clone);
+
+  // 递归拷贝对象的每个属性或元素
+  for (let key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      clone[key] = deepCopy(obj[key], visited);
+    }
+  }
+
+  return clone;
+}
