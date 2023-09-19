@@ -225,3 +225,28 @@ class TreeNode {
 // 取出[2,3]，还剩[1,1,4,5]
 // 取出[4,5]，还剩[1,1]
 // 综上有五种对数,[1,1][1,2][1,3][2,3][4,5]
+
+// 对于给定x值，将小于x的链表置于大于等于x的链表之前
+function changeFromX(head ,x){
+  if(head == null || head.next==null || x==0){
+    return head
+  }
+  let cur = head
+  let lowList = {}
+  let lowCur = lowList
+  let highList = {}
+  let highCur = highList
+  while(cur){
+    if(cur.val < x){
+      lowCur.next = cur
+      lowCur = lowCur.next
+    }else{
+      highCur.next = cur
+      highCur = highCur.next
+    }
+    cur = cur.next
+  }
+  highCur.next = null
+  lowCur.next = highList.next
+  return lowList.next
+}

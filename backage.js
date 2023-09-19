@@ -37,7 +37,6 @@ function knapsackComplete(weights, values, capacity) {
         }
       }
     }
-  
     return dp[n][capacity];
   }
   
