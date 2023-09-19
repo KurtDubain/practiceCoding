@@ -206,3 +206,34 @@ const vnode = new VNode('div', { class: 'container' }, [
 
 const domElement = vnode.render();
 document.body.appendChild(domElement);
+// reactive响应式处理
+function reactive(obj) {
+    // 创建一个Proxy代理对象
+    const observed = new Proxy(obj, {
+      get(target, key, receiver) {
+        // 依赖收集
+        track(target, key);
+        return Reflect.get(target, key, receiver);
+      },
+      set(target, key, value, receiver) {
+        const oldValue = target[key];
+        const result = Reflect.set(target, key, value, receiver);
+        if (value !== oldValue) {
+          // 触发更新
+          trigger(target, key);
+        }
+        return result;
+      },
+      deleteProperty(target, key) {
+        const hasKey = Reflect.has(target, key);
+        const result = Reflect.deleteProperty(target, key);
+        if (hasKey) {
+          // 触发更新
+          trigger(target, key);
+        }
+        return result;
+      },
+    });
+  
+    return observed;
+  }
