@@ -86,3 +86,27 @@ new Watcher(vm, 'count', function(newValue) {
 });
 
 data.count++; // 更新属性值，并触发 Watcher 的更新回调
+
+class Observer{
+  constructor(){
+      this.subers = []
+  }
+  subscribe(suber){
+      this.subers.push(suber)
+  }
+  unSubscribe(suber){
+      this.subers = this.subers.filter((item)=>item!==suber)
+  }
+  noify(data){
+      this.subers.forEach(suber=>suber.update(data))
+  }
+}
+
+class Subsciber{
+  constructor(name){
+      this.name=name
+  }
+  update(data){
+      console.log(`${this.name}更新了${data}数据`)
+  }
+}

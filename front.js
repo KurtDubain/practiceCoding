@@ -323,3 +323,44 @@ function deepCopy(obj, visited = new Map()) {
 
   return clone;
 }
+
+function retry(promiseFn, maxAttempts, delay = 0) {
+  return new Promise((resolve, reject) => {
+    let currentAttempt = 1;
+
+    function attempt() {
+      promiseFn()
+        .then(resolve)
+        .catch(error => {
+          if (currentAttempt < maxAttempts) {
+            currentAttempt++;
+            setTimeout(attempt, delay);
+          } else {
+            reject(error);
+          }
+        });
+    }
+
+    attempt();
+  });
+}
+
+// 示例用法
+// function fetchData() {
+//   return new Promise((resolve, reject) => {
+//     const random = Math.random();
+//     if (random < 0.8) {
+//       resolve('Data fetched successfully');
+//     } else {
+//       reject('Error: Failed to fetch data');
+//     }
+//   });
+// }
+
+// retry(fetchData, 3, 1000)
+//   .then(result => {
+//     console.log(result);
+//   })
+//   .catch(error => {
+//     console.log(error);
+//   });

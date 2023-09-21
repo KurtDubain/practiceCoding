@@ -8,14 +8,17 @@ function quickSort(arr) {
     const pivot = arr[Math.floor(Math.random()*arr.length)]
     const left = [];
     const right = [];
+    const eql = []
     for (let i = 0; i < arr.length; i++) {
       if (arr[i] < pivot) {
         left.push(arr[i]);
-      } else {
+      } else if(arr[i]>pivot) {
         right.push(arr[i]);
+      }else{
+        eql.push(arr[i])
       }
     }
-    return [...quickSort(left), pivot, ...quickSort(right)];
+    return [...quickSort(left), eql, ...quickSort(right)];
   }
   
 
