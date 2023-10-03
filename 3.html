@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>车辆种类监测</title>
+    <style>
+        #video-container {
+            position: relative;
+            width: 640px;
+            height: 480px;
+            border: 1px solid #ccc;
+        }
+        #bounding-box {
+            position: absolute;
+            border: 2px solid red;
+        }
+    </style>
+</head>
+<body>
+    <div id="video-container">
+        <video id="video" width="100%" height="100%" autoplay></video>
+        <canvas id="canvas" width="100%" height="100%"></canvas>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // 获取识别结果（假设数据格式为 { x, y, width, height }）
+        const recognitionData = { x: 100, y: 100, width: 200, height: 150 };
+
+        // 在每个视频帧上绘制识别结果方框
+        function drawBoundingBox() {
+            // 清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 根据识别数据绘制方框
+            ctx.beginPath();
+            ctx.lineWidth = '2';
+            ctx.strokeStyle = 'red';
+            ctx.rect(recognitionData.x, recognitionData.y, recognitionData.width, recognitionData.height);
+            ctx.stroke();
+        }
+
+        // 获取摄像头流
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                video.srcObject = stream;
+
+                // 在视频播放时绘制识别结果方框
+                video.addEventListener('play', function() {
+                    // 设置画布和视频大小一致
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+
+                    // 每帧绘制方框
+                    function loop() {
+                        if (video.paused || video.ended) {
+                            return;
+                        }
+                        drawBoundingBox();
+                        requestAnimationFrame(loop);
+                    }
+                    loop();
+                });
+            })
+            .catch(function(error) {
+                console.log('无法访问摄像头：', error);
+            });
+    </script>
+</body>
+</html>

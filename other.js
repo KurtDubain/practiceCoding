@@ -450,3 +450,36 @@ function minAddOneOperationsToMakeUnique(arr) {
 
   return operations;
 }
+
+// 对比两个对象是否相等
+function deepEqual(obj1, obj2) {
+  // 检查基本数据类型的相等性
+  if (obj1 === obj2) {
+    return true;
+  }
+
+  // 检查对象类型的相等性
+  if (typeof obj1 !== 'object' || obj1 === null ||
+      typeof obj2 !== 'object' || obj2 === null) {
+    return false;
+  }
+
+  // 获取 obj1 和 obj2 的属性数组
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+
+  // 检查属性数量是否一致
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+
+  // 递归比较每个属性的值
+  for (let key of keys1) {
+    if (!deepEqual(obj1[key], obj2[key])) {
+      return false;
+    }
+  }
+
+  // 所有属性都相等
+  return true;
+}
