@@ -364,3 +364,23 @@ function retry(promiseFn, maxAttempts, delay = 0) {
 //   .catch(error => {
 //     console.log(error);
 //   });
+
+function processPromiseQueue(queue) {
+  if (queue.length === 0) {
+    return Promise.resolve();
+  }
+
+  const currentPromise = queue[0];
+  return currentPromise
+    .then(result => {
+      console.log(result);
+      queue.shift(); 
+      return processPromiseQueue(queue); 
+    })
+    .catch(error => {
+      console.error(error);
+      queue.shift(); 
+      return processPromiseQueue(queue);
+    });
+}
+
