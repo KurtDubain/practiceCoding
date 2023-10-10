@@ -40,29 +40,21 @@
 // console.log('1',promise1)
 // console.log('2',promise2)
 
-// let m = 1
-// let n = 2
-// console.log(m, n)
-// [m, n] = [n, m]
-// console.log(m, n)
+function abc(obj,a){
+  obj.b=3
+  a=4
+}
+let obj={b:1}
+let a=2
+abc(obj,a)
+console.log(obj.b,a)
 
-// let m = 1;
-// let n = 2;
-// console.log(m, n);
-// [m, n] = [n, m];
-// console.log(m, n);
-
-
-
-console.log('Start');
-
-Promise.resolve().then(() => {
-  console.log('Microtask 1');
-  
-  Promise.resolve().then(() => {
-    console.log('Microtask 2');
-  });
-  console.log('jaha')
-});
-
-console.log('End');
+// let arr = [1,2,3,4,5]
+// let count = 0
+// arr.forEach((val1,val2)=>{
+//   count++
+//   if(count%3===0){
+//     return
+//   }
+//   console.log(val2)
+// })
