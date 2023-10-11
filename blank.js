@@ -39,27 +39,42 @@
 // })
 // console.log('1',promise1)
 // console.log('2',promise2)
-
-class Observer{
-  constructor(subers){
-    this.subers = []
-  }
-  sub(suber){
-    this.subers.push(suber)
-  }
-  unSub(suberName){
-    this.subers=this.subers.filter((suber)=>suber!==suberName)
-  }
-  notify(data){
-    this.subers.forEach((suber)=>suber.update(data))
+class NodeList{
+  constructor(val,next=null){
+    this.val = val
+    this.next = null
   }
 }
+function isBackNode(node){
+  if(!node&&!node.next){
+    return true
+  }
+  let slow = head
+  let quick = head
+  while(slow.next&&quick.next.next){
+    slow = slow.next
+    quick = quick.next.next
+  }
+  let midHead = reverse(slow)
+  let p1 = head
+  let p2 = midHead
+  while(p1.next&&p2.next){
+    if(p1.val!==p2.val){
+      return false
+    }
+  }
+  return true
+}
 
-class Subscibers{
-  constructor(name){
-    this.name=name
+function reverse(node){
+  let cur = node
+  let pre = null
+  while(cur){
+    let next = cur.next
+    cur.next = pre
+    pre = cur
+    cur = next
+    
   }
-  update(data){
-    console.log(``)
-  }
+  return pre
 }

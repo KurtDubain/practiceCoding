@@ -75,27 +75,31 @@ function findMaxTreeNodeFromRoot(root){
     return maxSum
 }
 // 寻找目标路径
-function findPathTarget(root,target){
-    const path = []
-    function dfs(node,path,curSum){
-        if(!node){
-            return
-        }
-        curSum += node.val
-        path.push(node.val)
-
-        if(!node.left && !node.right && curSum === target){
-            path.push([...path])
-        }
-        dfs(node.left,path,curSum)
-        dfs(node.right,path,curSum)
-
-        path.pop()
+function findTargetPath(root, target) {
+    const result = [];
+    
+    function dfs(node, path, curSum) {
+      if (!node) {
+        return;
+      }
+      
+      curSum += node.val;
+      path.push(node.val);
+  
+      if (!node.left && !node.right && curSum === target) {
+        result.push([...path]);
+      }
+      
+      dfs(node.left, path, curSum);
+      dfs(node.right, path, curSum);
+  
+      path.pop();
     }
-    dfs(root,[],0)
-
-    return path
-}
+    
+    dfs(root, [], 0);
+  
+    return result;
+  }
 
 // 二叉平衡树
 class TreeNode {
