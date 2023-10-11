@@ -40,21 +40,26 @@
 // console.log('1',promise1)
 // console.log('2',promise2)
 
-function abc(obj,a){
-  obj.b=3
-  a=4
+class Observer{
+  constructor(subers){
+    this.subers = []
+  }
+  sub(suber){
+    this.subers.push(suber)
+  }
+  unSub(suberName){
+    this.subers=this.subers.filter((suber)=>suber!==suberName)
+  }
+  notify(data){
+    this.subers.forEach((suber)=>suber.update(data))
+  }
 }
-let obj={b:1}
-let a=2
-abc(obj,a)
-console.log(obj.b,a)
 
-// let arr = [1,2,3,4,5]
-// let count = 0
-// arr.forEach((val1,val2)=>{
-//   count++
-//   if(count%3===0){
-//     return
-//   }
-//   console.log(val2)
-// })
+class Subscibers{
+  constructor(name){
+    this.name=name
+  }
+  update(data){
+    console.log(``)
+  }
+}
