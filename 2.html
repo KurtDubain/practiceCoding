@@ -31,7 +31,35 @@
         left: 0px;
         top: 0px;
     }
+    .hexagon {
+        width: 100px;
+        height: 55px;
+        background-color: #ff0000;
+        position: relative;
+    }
+
+    .hexagon:before,
+    .hexagon:after {
+        content: "";
+        position: absolute;
+        left: 0;
+        width: 0;
+        border-left: 50px solid transparent;
+        border-right: 50px solid transparent;
+    }
+
+    .hexagon:before {
+        bottom: 100%;
+        border-bottom: 27.5px solid #ff0000;
+    }
+
+    .hexagon:after {
+        top: 100%;
+        width: 0;
+        border-top: 27.5px solid #ff0000;
+    }
 </style>
+
 <body>
     <div id="dad-dad">
         <div id="dad1">
@@ -44,5 +72,6 @@
             <div id="child5"></div>
         </div>
     </div>
+    <div class="hexagon"></div>
 </body>
 </html>
