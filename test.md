@@ -157,7 +157,17 @@ vm.data.dataValue = 'Updated Value'; // 视图会自动更新
 
 >`Watcher()`：监听dataValue以及其他data中的响应式属性，在发生状态变化的时候进行回调更新操作。
 
-**以上就是一个简单的Vue2响应式系统的实现过程**
+以上就是一个简单的Vue2响应式系统的实现过程。对于Vue2的响应式实现方式，存在一定缺陷：
+
+>对于新增的对象属性无法绑定响应式，需要手动Vue.set（this.$set）来处理才能实现响应式；
+
+>对于对象属性的新增和删除，Vue2无法监听到，也需要手动使用set方法来进行处理；
+
+>对于数组的一些变动（比如直接通过索引修改元素）也无法监听，需要使用特定的数组方法（push、pop、shift、unshift、splice）来触发响应
+
+>不支持Map、Set数据类型，同时存在性能问题（需要对响应式每一个数据进行监听，存在无意义的监听）
+
+针对上述部分缺陷，Vue3的Proxy代理优化了响应式系统。
 
 ***
 ## Vue3
@@ -174,20 +184,146 @@ vm.data.dataValue = 'Updated Value'; // 视图会自动更新
 >实际应用；
 </div>
 
-接下来我会结合简单的代码来讲解：
-
-***
+接下来我会结合`reactive`的实现来讲解：
 
 ### Vue3的Proxy劫持
+<div style="max-width: 90%; overflow: auto;">
+  <pre>
+    <code class="language-javascript">
+function reactive(obj) {
+  return new Proxy(obj, {
+    get(target, key) {
+      track(target, key);
+      return Reflect.get(target, key); // 使用 Reflect 获取属性值
+    },
+    set(target, key, value) {
+      Reflect.set(target, key, value); // 使用 Reflect 设置属性值
+      trigger(target, key);
+      return true;
+    },
+    deleteProperty(target, key) {
+      const success = Reflect.deleteProperty(target, key); // 使用 Reflect 删除属性
+      trigger(target, key);
+      return success;
+    }
+  });
+}
+    </code>
+  </pre>
+</div>
+
+通过使用Proxy对象，它能够拦截对对象的各种操作，**注意，Vue3的拦截是面向对象的，而不是面向单独一个属性的**，因此他的get和set分别触发了对应的依赖收集操作以及Reflect的控制对象，能够拦截对对象属性的添加和拦截操作，同时对修改后的属性进行自动响应式处理，无需手动，通过使用Reflect能够简化代码同时提高可维护性，对于对象的属性的修改、获取、删除的操作更加直接，避免有其他副作用，简单说明一下参数和方法：
+
+>`obj`：实际操作对象；
+
+>`target`：代理操作对象，数值和obj相同；
+
+>`key`：属性名；
+
+>`get()`：当访问对象属性时，会触发get拦截，追踪依赖进行依赖收集操作，并且返回对应的值；
+
+>`set()`：当修改对象属性的时候，会触发set拦截，通过触发触发器方法来更新依赖；
+
+>`deleteProperty()`：删除对象属性的时候，也会触发触发器实现更新。
+
+**通过利用Proxy实现响应式处理，能够实现懒处理，也就是对于没有用到的数据，并不会进行递归遍历，这一点不同于Vue2的将全部数据一股脑的进行响应式处理和更新，也算是优化了性能**
 
 ### Vue3的依赖收集
+<div style="max-width: 90%; overflow: auto;">
+  <pre>
+    <code class="language-javascript">
+//依赖追踪
+function track(target, key) {
+  if (activeEffect) {
+    let depsMap = target.__depsMap || (target.__depsMap = new Map());
+    let dep = depsMap.get(key) || (depsMap.set(key, new Set()), depsMap.get(key));
+    dep.add(activeEffect);
+  }
+}
+// 触发更新
+function trigger(target, key) {
+  const depsMap = target.__depsMap;
+  if (depsMap) {
+    const dep = depsMap.get(key);
+    if (dep) {
+      dep.forEach(effect => {
+        effect();
+      });
+    }
+  }
+}
+    </code>
+  </pre>
+</div>
+
+Vue3的依赖关系主要是利用依赖追踪和更新来实现的，具体说明如下：
+
+>`track()`：主要是用来收集依赖关系，当一个响应式对象的属性被访问的时候，会将当前活跃的副作用函数（activeEffect）添加到依赖列表中，维护Map列表；
+
+>`trigger()`：主要是用来触发更新操作，当一个对象的属性发生变化的时候，会根据已有的依赖列表来对应的执行副作用函数，这一操作也被称为**按需更新**，不需要在一个属性需要更新的情况下，通知所有依赖进行更新。
 
 ### Vue3的副作用函数的使用
 
-### Vue3应用示例以及笔者留言
+<div style="max-width: 90%; overflow: auto;">
+  <pre>
+    <code class="language-javascript">
+//初始化副作用函数（不活跃）
+let activeEffect = null;
+function effect(fn) {
+  const effectFn = () => {
+    try {
+      activeEffect = fn;
+      return fn();
+    } finally {
+      activeEffect = null;
+    }
+  };
+  effectFn(); // 立即执行一次
+  return effectFn;
+}
+    </code>
+  </pre>
+</div>
 
+Effect方法主要是用于创建一个响应式的副作用函数，这个函数会在初始化的阶段进行一次依赖收集，然后再后续属性变化的时候再执行更新操作；这个类似Vue2中的Watcher，用于对发生变化的数据进行监听，执行对应的回调。
+
+通过维护每个属性以及对应的Effect方法之间的关系（使用Map），来进行对应的属性触发Effect操作。
+
+### Vue3应用示例以及笔者留言
+<div style="max-width: 90%; overflow: auto;">
+  <pre>
+    <code class="language-javascript">
+const state = reactive({
+  count: 0
+});
+const double = effect(() => {
+  console.log('Double:', state.count * 2);
+});
+state.count++; // 触发 double 函数执行
+    </code>
+  </pre>
+</div>
+
+示例中，使用reactive维护了一个对象，在修改对象中的数据的时候，就会触发对应的方法。
+
+但是要注意，开发过程中，建议常用ref来处理响应式数据，因为对于reactive处理过后的对象数据，在直接操作的时候会使其失去响应式，**这主要是因为reactive本身返回的是一个普通的JS对象，在直接修改属性的时候，不会出发Proxy拦截，进而无法进行依赖追踪和更新通知，为了解决这种问题，建议使用例如set函数来进行修改**，或者使用ref来处理响应式对象。
+
+#### 关于双向绑定和响应式的关系
+
+<ul>
+<li>响应式：通常指Vue中是的数据和视图保持同步的机制，当二者任意一个发生变化的时候，相关的另一个会自动更新，类似一个自动化的监听数据的方式，主要原理就是上述的两种方式；
+</li>
+<li>双向绑定：通常指视图和数据之间建立了一个双向的联系，通常在特定的应用场景下（比如选择框、输入框等），可以使用户在客户端的输入框中进行数据的修改，同时直接更新实际数据，动态联系视图和数据，通常使用v-model来实现（基于v-bind和事件监听）。
+</li>
+<li>响应式和双向绑定是两个关联紧密的概念，但它们并不是相同的。响应式是一种机制，用于实时感知数据变化并做出相应的行为，而双向绑定则是一种应用场景，它利用响应式机制将视图和数据之间建立起双向的联系。
+</li>
+</ul>
+
+***
 ## 源代码
-### Vue2
+
+### Vue2源码
+
 <div style="max-width: 90%; overflow: auto;">
   <pre>
     <code class="language-javascript">      
@@ -256,11 +392,12 @@ vm.data.dataValue = 'Updated Value'; // 视图会自动更新
   </pre>
 </div>
 
-### Vue3
+### Vue3源码
+
 <div style="max-width: 90%; overflow: auto;">
   <pre>
     <code class="language-javascript">
-// 用于追踪依赖关系的全局变量
+// 用于初始化副作用函数（非活跃）
 let activeEffect = null;
 function reactive(obj) {
   return new Proxy(obj, {
