@@ -16,21 +16,17 @@
 
   <script src="https://cdn.jsdelivr.net/npm/compressorjs@1.1.0"></script>
   <script>
-    // 获取图片选择器和压缩按钮元素
     const imageInput = document.getElementById('imageInput');
     const compressButton = document.getElementById('compressButton');
 
-    // 监听压缩按钮的点击事件
     compressButton.addEventListener('click', async () => {
-      // 从图片选择器中获取用户选择的图片文件
       const file = imageInput.files[0];
 
       if (file) {
         try {
-          // 使用 Compressor.js 进行图片压缩
           const compressedFile = await new Promise((resolve, reject) => {
             new Compressor(file, {
-              quality: 0.6,
+              quality: 0.3,
               success(result) {
                 resolve(result);
               },
@@ -40,18 +36,18 @@
             });
           });
 
-          // 创建下载链接
-          const downloadLink = document.createElement('a');
-          downloadLink.href = URL.createObjectURL(compressedFile);
-          downloadLink.download = 'compressed_image.jpg';
+          const fileName = prompt('请输入要保存的文件名（不带后缀）：');
+          if (fileName) {
+            const downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(compressedFile);
+            downloadLink.download = `${fileName}.jpg`;
 
-          // 模拟点击下载链接
-          const event = document.createEvent('MouseEvents');
-          event.initEvent('click', true, false);
-          downloadLink.dispatchEvent(event);
+            const event = document.createEvent('MouseEvents');
+            event.initEvent('click', true, false);
+            downloadLink.dispatchEvent(event);
 
-          // 释放临时 URL 对象
-          URL.revokeObjectURL(downloadLink.href);
+            URL.revokeObjectURL(downloadLink.href);
+          }
         } catch (error) {
           console.error('图片压缩失败：', error);
         }
