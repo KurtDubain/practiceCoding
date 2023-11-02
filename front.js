@@ -384,3 +384,27 @@ function processPromiseQueue(queue) {
     });
 }
 
+// 输入参数为promise数组，最大限制并发数 limitMax=3
+function promiseLimit(promiseArr,limitMax){
+  let pool=[];   //设置并发池
+    // 向并发池添加promise的方法
+  function add(){
+           let item=promiseArr.shift();
+           pool.push(item);
+      }
+//***************************
+   function run(){
+           if(promiseArr.length===0) return;
+           let done=Promise.race(pool);   //pool满了后，直接race，获取最快执行完的promise
+           done.then(res=>{
+              pool.splice(pool.indexOf(done),1);      //promise执行完后，删掉在pool中的位置。
+              add();
+           });
+            run();
+   }
+   while(pool.length<limitMax){       //当pool未满时，往里加promise。
+         add();
+  }
+  run();
+}
+
