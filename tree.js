@@ -230,3 +230,17 @@ function bfs(root) {
   
     return root;
   }
+
+function reverseTree(root){
+    if(root === null){
+        return null
+    }
+    
+    const left = reverseTree(root.left)
+    const right = reverseTree(root.right)
+
+    root.left = right
+    root.right = left
+
+    return root
+}
