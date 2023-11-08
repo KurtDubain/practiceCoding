@@ -7,33 +7,53 @@
     <title>Document</title>
 </head>
 <style>
-    
+  .theGrandpa{
+    width: 500px;
+    height: 500px;
+    background-color:aqua;
+  }
+  .theDad{
+    width: 400px;
+    height: 400px;
+    background-color: blue;
+    margin: 0;
+  }
+  .theSon{
+    width: 300px;
+    height: 300px;
+    background-color: black;
+    margin: 0;
+  }
+  .theGrandSon{
+    width: 200px;
+    height: 200px;
+    background-color: blueviolet;
+    margin: 0;
+  }
 </style>
 
 <body>
-    <!-- Include Quill stylesheet -->
-<link href="https://cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet" />
+  <div class="theGrandpa">
+    <div class="theDad">
+      <div class="theSon">
+        <div class="theGrandSon">click Me!
+        </div>
+      </div>
+    </div>
+  </div>
 
-<!-- Create the toolbar container -->
-<div id="toolbar">
-  <button class="ql-bold">Bold</button>
-  <button class="ql-italic">Italic</button>
-</div>
 
-<!-- Create the editor container -->
-<div id="editor">
-  <p>Hello World!</p>
-</div>
 
-<!-- Include the Quill library -->
-<script src="https://cdn.quilljs.com/1.0.0/quill.js"></script>
 
 <!-- Initialize Quill editor -->
 <script>
-  var editor = new Quill('#editor', {
-    modules: { toolbar: '#toolbar' },
-    theme: 'snow',
-  });
+  function handleClick(event){
+    console.log('currentTarget is:',event.currentTarget)
+    console.log('the target is :',event.target)
+  }
+
+  const needClick = document.querySelector('.theGrandpa')
+  needClick.addEventListener('click',handleClick,true)
 </script>
 </body>
 </html>
