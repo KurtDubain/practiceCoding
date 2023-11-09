@@ -49,7 +49,7 @@ function debounce(func,delay){
         })
     }
 }
-// 4、对象的dfs（递归、非递归）和bfs
+// 4、对象的dfs（递归、非递归）和bfs和层级遍历多叉树
 function dfsObj1(obj){
     console.log(obj)
     for(let key in obj){
@@ -110,15 +110,102 @@ function Ch16To10(str){
 // 6、解析数组（JSON.parse）
 // 7、手写固定和
 // 8、函数柯里化func(1)(2)(3)
+
 // 9、手写Promise以及then以及All
 // 10、长字符串在长文本中的查找
 // 11、实现LRU
 // 12、call、bind、apply方法手写
+function myCall(context,arg){
+    context = context||window
+    const fn = Symbol('fn')
+    context[fn] = this
+    const result = context[fn](arg)
+    delete context[fn]
+    return result
+}
+function myApply(context,...args){
+    context = context||window
+    const fn = Symbol('fn')
+    context[fn] = this
+    const result = context[fn](...args)
+    delete context[fn]
+    return result
+}
+function myBind(context,...args){
+    const fn = this
+    return function(...newArgs){
+        return fn.apply(context,args.concat(...newArgs))
+    }
+}
 // 13、深拷贝（解决循环应用）
+function Deepclone(obj,visited = new Map()){
+    if(typeof(obj)!=='object'||obj===null){
+        return obj
+    }
+    if(visited.has(obj)){
+        return visited.get(obj)
+    }
+    const clone = Array.isArray(obj)?[]:{}
+    visited.set(obj,clone)
+    for(let key in obj){
+        if(obj.hasOwnProperty(key)){
+            clone[key] = Deepclone(obj[key],visited)
+        }
+    }
+    return clone
+
+}
 // 14、翻转二叉树
+
 // 15、零钱兑换
+
 // 16、-_转驼峰命名
+
 // 17、快排
+function quickSort(arr){
+    if(arr.length<=1){
+        return arr
+    }
+    let p = Math.floor(arr.length/2)
+    let right = []
+    let left = []
+    let mid = []
+    for(let i = 0;i<arr.length;i++){
+        if(arr[i]>arr[p]){
+            right.push(arr[i])
+        }else if(arr[i]<arr[p]){
+            left.push(arr[i])
+        }else{
+            mid.push(arr[i])
+        }
+    }
+    return [...quickSort(left),...mid,...quickSort(right)]
+}
 // 18、求每个元素在数组中比他小的其他元素的个数
+
 // 19、手写new和寄生组合式继承
+
+function myNew(constructor,...args){
+    const newObj = Object.create(constructor.prototype)
+    const result = constructor.apply(newObj,args)
+    return result instanceof Object?result:newObj
+}
+
+function Person(name){
+    this.name = name
+}
+Person.prototype.introduceMe= function(){
+    console.log(`i am ${this.name}`)
+}
+
+function Child(name,sex){
+    Person.call(this,name)
+    this.sex = sex
+}
+Child.prototype = Object.create(Person.prototype)
+Child.prototype.constructor = Child
+
+Child.prototype.haha = function(){
+    console.log(`i am ${this.name},i am ${this.sex}`)
+}
 // 20、反转链表
