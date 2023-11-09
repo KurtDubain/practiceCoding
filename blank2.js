@@ -108,12 +108,120 @@ function Ch16To10(str){
     return sum
 }
 // 6、解析数组（JSON.parse）
+function parseArr(str){
+    let index = 0
+    function parse(){
+        const result = []
+        while(index < str.length){
+            const char = str[index]
+            if(char === '['){
+                index++
+                result.push(parse())
+            }else if(char === ']'){
+                index++
+                break
+            }else if(char === ','){
+                index++
+            }else{
+                let value = ''
+                while(index<str.length&&str[index]!==','&&str[index]!==']'){
+                    value += str[index]
+                    index++
+                }
+                result.push(parseVal(value))
+            }
+            return result
+        }
+        function parseVal(value){
+            if(!isNaN(value)){
+                return Number(value)
+            }
+            if(value.startWith('"')&&value.endWith('"')&&value.length>=2){
+                return value.slice(1,-1)
+            }
+            return value
+        }
+        return parse()
+    }
+}
 // 7、手写固定和
+function findSum(arr,target){
+    const newMap = new Map()
+    const result = []
+    for(let i = 0;i <arr.length;i++){
+        if(newMap.has(target-arr[i])){
+            result.push([arr[i],target-arr[i]])
+        }
+        newMap.set(arr[i],i)
+    }
+    return result
+}
 // 8、函数柯里化func(1)(2)(3)
-
+function curry(func){
+    return function curried(...args){
+        if(args.length>=func.length){
+            return fn.apply(this,...args)
+        }else{
+            return function(...newArgs){
+                return curried.apply(this,args.concat(newArgs))
+            }
+        }
+    }
+}
 // 9、手写Promise以及then以及All
+function promiseAll(arr){
+    return new Promise((resolve,reject)=>{
+        const results = []
+        let finish = 0
+        if(arr.length===0){
+            resolve(results)
+        }
+        arr.forEach((promise,index) => {
+            Promise.resolve(promise)
+            .then(value=>{
+                results[index] = value
+                finish++
+
+                if(finish===arr.length){
+                    resolve(results)
+                }
+            })
+            .catch(error=>{
+                reject(error)
+            })
+        });
+    })
+}
 // 10、长字符串在长文本中的查找
+function findLongStr(strDad,strSon){
+    let index = strDad.indexOf(strSon)
+    return index
+}
 // 11、实现LRU
+class LRUCache{
+    constructor(capacity){
+        this.capacity = capacity
+        this.cache = new Map()
+    }
+    get(key){
+        if(this.cache.has(key)){
+            const value = this.cache.get(key)
+            this.cache.delete(key)
+            this.cache.set(key,value)
+            return value
+        }
+        return -1
+    }
+    put(key,value){
+        if(this.cache.has(key)){
+            this.cache.delete(key)
+        }else if(this.cache.size>=this.capacity){
+            const oldestKey = this.cache.keys().next().value
+            this.cache.delete(oldestKey)
+        }
+        this.cache.set(key,value)
+    }
+}
 // 12、call、bind、apply方法手写
 function myCall(context,arg){
     context = context||window
@@ -156,11 +264,41 @@ function Deepclone(obj,visited = new Map()){
 
 }
 // 14、翻转二叉树
+function reverseTree(root){
+    if(!root){
+        return
+    }
+    const left = reverseTree(root.left)
+    const right = reverseTree(root.right)
 
+    root.left = right
+    root.right = left
+
+    return root
+}
 // 15、零钱兑换
-
+function findMoney(account,coins){
+    const dp = new Array(account+1).fill(Infinity)
+    dp[0] = 0
+    for(let i = 1;i<=account;i++){
+        for(let coin of coins){
+            if(coin<=i){
+                dp[i] = Math.min(dp[i],dp[i-coin]+1)
+            }
+        }
+    }
+    return dp[account]
+}
 // 16、-_转驼峰命名
-
+function changeToCamel(str){
+    const charArr = str.split(/[-_]/)
+    const result = [charArr[0]]
+    for(let i = 1;i<charArr.length;i++){
+        const char = charArr[i]
+        result.push(char.charAt(0).toUpperCase()+char.slice(1))
+    }
+    return result.join('')
+}
 // 17、快排
 function quickSort(arr){
     if(arr.length<=1){
@@ -182,7 +320,14 @@ function quickSort(arr){
     return [...quickSort(left),...mid,...quickSort(right)]
 }
 // 18、求每个元素在数组中比他小的其他元素的个数
-
+function findSmaller(arr){
+    let result = []
+    const arrNew = arr.slice().sort((a,b)=>a-b)
+    for(let i = 0;i<arr.length;i++){
+        result.push(arrNew.indexOf(arr[i]))
+    }
+    return result
+}
 // 19、手写new和寄生组合式继承
 
 function myNew(constructor,...args){
@@ -208,4 +353,37 @@ Child.prototype.constructor = Child
 Child.prototype.haha = function(){
     console.log(`i am ${this.name},i am ${this.sex}`)
 }
-// 20、反转链表
+// 20、回文链表
+function isBackList(head){
+    if(!head||!head.next){
+        return true
+    }
+    let fast = head
+    let slow = head
+    while(fast.next.next&&fast.next){
+        fast = fast.next.next
+        slow = slow.next
+    }
+    let newHead = reverseNodeList(slow)
+    let p1 = head
+    let p2 = newHead
+    while(p1&&p2){
+        if(p1.val !== p2.val ){
+            return false
+        }
+        p1 = p1.next
+        p2 = p2.next
+    }
+    return true
+}
+function reverseNodeList(head){
+    let cur = head
+    let pre = null
+    while(cur){
+        let next = cur.next
+        cur.next = pre
+        pre = cur
+        cur = next
+    }
+    return pre
+}
