@@ -576,3 +576,38 @@ function kmpSearch(text, pattern) {
 
   return matchedIndices;
 }
+// 深度优先遍历对象（递归和非递归）和广度优先遍历对象
+function dfsObj1(obj){
+  console.log(obj)
+  for(let key in obj){
+      if(typeof(obj[key])==='object'&&obj[key]!==null){
+          dfsObj1(obj[key])
+      }
+  }
+}
+
+function dfsObj2(obj){
+  const stack = [obj]
+  while(stack.length>0){
+      const current = stack.pop()
+      console.log(current)
+      for(let key in current){
+          if(typeof(current[key])==='object'&&current[key]!==null){
+              stack.push(current[key])
+          }
+      }
+  }
+}
+function bfsObj(obj){
+  const queue = [obj]
+  while(queue.length>0){
+      const current = queue.shift()
+      console.log(current)
+      for(let key in current){
+          if(typeof(current[key])==='object'&&current[key]!==null){
+              queue.push(current[key])
+          }
+      }
+      
+  }
+}
