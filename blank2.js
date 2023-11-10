@@ -387,3 +387,91 @@ function reverseNodeList(head){
     }
     return pre
 }
+// 21、递归实现Pow方法
+function NewPow(x,n){
+    if(n===0){
+        return 1
+    }
+    return x*NewPow(x,n-1)
+}
+// 22、跳台阶
+function jumpFloor1(n){
+    if(n===0){
+        return 0
+    }else if(n===1){
+        return 1
+    }else if(n===2){
+        return 2
+    }else{
+        return jumpFloor1(n-1)+jumpFloor1(n-2)
+    }
+}
+function jumpFloor2(n){
+    if(n <= 0){
+        return 0 
+    }else if(n ===1){
+        return 1
+    }else if(n===2){
+        return 2
+    }else{
+        const dp = new Array(n+1)
+        dp[1] = 1
+        dp[2] = 2
+        for(let i = 3;i<=n;i++){
+            dp[i] = dp[i-1]+dp[i-2]
+        }
+        return dp[n]
+    }
+}
+// 23、打家劫舍
+function rob1(arr){
+    const n = arr.length
+    if(n === 0){
+        return 0
+    }
+    if(n===1){
+        return arr[0]
+    }
+    const dp = new Array(n)
+    dp[0] = arr[0]
+    dp[1] = Math.max(arr[0],arr[1])
+    for(let i = 2;i<n;i++){
+        dp[i] = Math.max(dp[i-1],dp[i-2]+arr[i])
+    }
+    return dp[n-1]
+}
+// 24、最长无重复子串
+function findLongStr(str){
+    let start = 0
+    let end = 0
+    let maxSum = 0
+    const remSet = new Set()
+    while(start<str.length&&end<str.length){
+        if(!remSet.has(str[end])){
+            remSet.add(str[end],end)
+            maxSum = Math.max(maxSum,end-start+1)
+            end++
+        }else{
+            remSet.delete(str[start])
+            start++
+        }
+    }
+    return maxSum
+}
+// 25、千分位转换
+function changeK(str){
+    const newArr = str.split('.')
+    const [intArr,decArr] = newArr
+    let count = 2
+    const result = []
+    for(let i = intArr.length-1;i>=0;i--){
+        result.unshift(intArr[i])
+        if(count===0&&i!==0){
+            result.unshift(',')
+            count = 2
+        }else{
+            count -- 
+        }
+    }
+    return decArr?`${result.join('')}.${decArr}`:result.join('')
+}
