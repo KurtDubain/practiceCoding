@@ -11,9 +11,12 @@ function bigNumAdd(str1,str2){
         let sum = num1+num2+carry
         result.unshift(sum%10)
         carry = Math.floor(sum/10)
+        i--
+        j--
     }
     return result.join('')
 }
+
 // 2、instanceof手写
 function NewInstanceof(obj,constructor){
     if(obj===null||typeof(obj)!=='object'){
@@ -130,20 +133,23 @@ function parseArr(str){
                 }
                 result.push(parseVal(value))
             }
-            return result
+            
         }
+        return result
         function parseVal(value){
             if(!isNaN(value)){
                 return Number(value)
             }
-            if(value.startWith('"')&&value.endWith('"')&&value.length>=2){
+            if(value.startsWith('"')&&value.endsWith('"')&&value.length>=2){
                 return value.slice(1,-1)
             }
             return value
         }
-        return parse()
+        
     }
+    return parse()
 }
+
 // 7、手写固定和
 function findSum(arr,target){
     const newMap = new Map()
@@ -192,6 +198,22 @@ function promiseAll(arr){
         });
     })
 }
+const promise1 = Promise.resolve(1);
+const promise2 = new Promise((resolve, reject) => {
+  setTimeout(() => resolve(2), 1000);
+});
+const promise3 = new Promise((resolve, reject) => {
+  setTimeout(() => resolve(3), 500);
+});
+// const promise4 = Promise.reject("Error!");
+promiseAll([promise1, promise2, promise3])
+  .then((results) => {
+    console.log(results); // [1, 2, 3]
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+
 // 10、长字符串在长文本中的查找
 function findLongStr(strDad,strSon){
     let index = strDad.indexOf(strSon)
