@@ -198,21 +198,6 @@ function promiseAll(arr){
         });
     })
 }
-const promise1 = Promise.resolve(1);
-const promise2 = new Promise((resolve, reject) => {
-  setTimeout(() => resolve(2), 1000);
-});
-const promise3 = new Promise((resolve, reject) => {
-  setTimeout(() => resolve(3), 500);
-});
-// const promise4 = Promise.reject("Error!");
-promiseAll([promise1, promise2, promise3])
-  .then((results) => {
-    console.log(results); // [1, 2, 3]
-  })
-  .catch((error) => {
-    console.error(error);
-  });
 
 // 10、长字符串在长文本中的查找
 function findLongStr(strDad,strSon){
@@ -525,5 +510,61 @@ function isClosed(str){
 // 28、Observer
 
 // 29、Promise的retry
-
+function retry(func,count){
+    return new Promise((resolve,reject)=>{
+        let times = 0
+        function tryIt(){
+            func().
+            then(result=>{
+                resolve(result)
+            })
+            .catch((error)=>{
+                if(times<count){
+                    times++
+                    tryIt()
+                }else{
+                    reject(error)
+                }
+            })
+        }
+        tryIt()
+    })
+}
 // 30、Promise的递归调用
+function DiguiPromise(arr){
+    if(arr.length<1){
+        return Promise.resolve()
+    }
+    let cur = arr[0]
+    return cur.then(result=>{
+        arr.pop()
+        console.log(result)
+        DiguiPromise(arr)
+    }).catch(error=>{
+        arr.pop()
+        console.log(error)
+        DiguiPromise(arr)
+    })
+}
+// 31、对象扁平化
+function flattenObject(obj) {
+    const result = {};
+  
+    function recurse(currentObj, currentKey) {
+      for (let key in currentObj) {
+        if (currentObj.hasOwnProperty(key)) {
+          const newKey = currentKey ? `${currentKey}.${key}` : key;
+  
+          if (typeof currentObj[key] === 'object' && currentObj[key] !== null) {
+            recurse(currentObj[key], newKey);
+          } else {
+            result[newKey] = currentObj[key];
+          }
+        }
+      }
+    }
+  
+    recurse(obj, '');
+  
+    return result;
+  }

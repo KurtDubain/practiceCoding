@@ -75,7 +75,7 @@ class Watcher {
 }
 
 // 示例用法
-const vm = {};
+// const vm = {};
 const data = {
   count: 0
 };

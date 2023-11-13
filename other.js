@@ -423,9 +423,9 @@ testObj[Symbol.iterator] = function() {
   };
 };
 
-for (const [key, value] of testObj) {
-  console.log(key, value);
-}
+// for (const [key, value] of testObj) {
+//   console.log(key, value);
+// }
 
 Object.prototype[Symbol.iterator]=function*(){
   for(let key in this){
@@ -611,3 +611,25 @@ function bfsObj(obj){
       
   }
 }
+
+// 数组拍平结构转树
+function arrToTree(arr,parentId = null){
+  const tree = []
+  for(let i = 0;i<arr.length;i++){
+      const item = arr[i]
+    if(item.pid === parentId){
+      const child = arrToTree(arr,item.id)
+      const newItem = {...item,child}
+      tree.push(newItem)
+    }
+  }
+  return tree
+}
+const arr1 =[
+  {id:1,pid:null,name:'first'},
+  {id:2,pid:1,name:'second'},
+  {id:3,pid:2,name:'third'},
+  {id:4,pid:2,name:'forth'},
+  {id:5,pid:3,name:'fifth'}
+]
+console.log(arrToTree(arr1,null))
