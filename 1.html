@@ -7,33 +7,38 @@
     <title>Document</title>
 </head>
 <style>
-    .container {
-  position: relative;
+
+
+/* 分页样式 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
-.custom-button {
-  position: relative;
-  border: none;
-  padding: 10px 20px;
-  background-color: white;
-  color: black;
+.page-item {
+  list-style: none;
+  display: inline-block;
 }
 
-.custom-button::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  border: 1px solid black;
-  transform: scale(0.7);
+.page-link {
+  color: #333;
+  font-size: 16px;
+  text-decoration: none;
+  padding: 5px 10px;
+  border: 1px solid #999;
+  border-radius: 5px;
+  margin: 0 5px;
+}
+
+.page-link:hover {
+  background-color: #f2f2f2;
 }
 </style>
 <body>
-    <div class="container">
-        <button class="custom-button">Click Me</button>
-      </div>
+    <ul class="pagination">
+      <li  class="page-item"><span class="page-link">Next</span></li>
+    </ul>
     <script>
 
     </script>
