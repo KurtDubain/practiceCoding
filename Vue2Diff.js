@@ -15,7 +15,7 @@ function updateChildren(el, oldChildren, newChildren) {
         memo[cur.key] =  index
         return memo
       }, {})
-    }
+    }  
     const keysMap = makeIndexBykey(oldChildren)
     
     // 只有当新、老儿子的开始下标都小于等于结束下标时才循环，一方不满足就结束循环

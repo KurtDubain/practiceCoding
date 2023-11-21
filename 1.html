@@ -1,46 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <!-- 引入Vue.js的下一个版本 -->
+  <script src="https://unpkg.com/vue@next"></script>
 </head>
 <style>
-
-
-/* 分页样式 */
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.page-item {
-  list-style: none;
-  display: inline-block;
-}
-
-.page-link {
-  color: #333;
-  font-size: 16px;
-  text-decoration: none;
-  padding: 5px 10px;
-  border: 1px solid #999;
-  border-radius: 5px;
-  margin: 0 5px;
-}
-
-.page-link:hover {
-  background-color: #f2f2f2;
-}
+  /* 样式定义 */
+  #example {
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; 
+    width: min-content;
+  }
+  .box {
+    width: 200px;
+    height: 200px;
+    margin: 10px;
+  }
+  .box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 </style>
-<body>
-    <ul class="pagination">
-      <li  class="page-item"><span class="page-link">Next</span></li>
-    </ul>
-    <script>
 
-    </script>
+<body>
+  <div id="example">
+    <!-- 使用v-for指令循环渲染content数组中的每个元素 -->
+    <div class="box" v-for="(item, index) in content" :key="index">
+      <!-- 如果item.loaded为true，则显示对应的图片 -->
+      <img v-if="item.loaded" :src="item.src" :alt="item.num" title="hh">
+      
+      <!-- 如果item.loaded为false，则显示默认的加载中图片 -->
+      <img v-else :src="defaultUrl" :alt="item.num" title="aa">
+
+    </div>
+  </div>
+  <script>
+    const app = Vue.createApp({
+      setup() {
+        // 初始化内容数组和默认图片URL
+        let content = Vue.ref([
+          { src: 'https://static.nowcoder.com/ajax/img/vue-Lazyloading/img/img1.jpg',loaded:false, num: '4500' },
+          { src: 'https://static.nowcoder.com/ajax/img/vue-Lazyloading/img/img2.jpg', loaded:false, num: '368724' },
+          { src: 'https://static.nowcoder.com/ajax/img/vue-Lazyloading/img/img3.jpg', loaded:false, num: '96487' },
+          { src: 'https://static.nowcoder.com/ajax/img/vue-Lazyloading/img/img4.jpg', loaded:false, num: '86944' },
+          { src: 'https://static.nowcoder.com/ajax/img/vue-Lazyloading/img/img5.jpg', loaded:false, num: '43761' },
+          { src: 'https://static.nowcoder.com/ajax/img/vue-Lazyloading/img/img6.jpg', loaded:false, num: '64937' },
+          { src: 'https://static.nowcoder.com/ajax/img/vue-Lazyloading/img/img7.jpg',loaded:false,  num: '34978' },
+          { src: 'https://static.nowcoder.com/ajax/img/vue-Lazyloading/img/img8.jpg', loaded:false, num: '64913' },
+          { src: 'https://static.nowcoder.com/ajax/img/vue-Lazyloading/img/img9.jpg', loaded:false, num: '42567' },
+          { src: 'https://static.nowcoder.com/ajax/img/vue-Lazyloading/img/img10.jpg',loaded:false,  num: '4697' },
+          { src: 'https://static.nowcoder.com/ajax/img/vue-Lazyloading/img/img11.jpg', loaded:false, num: '64874' },
+          { src: 'https://static.nowcoder.com/ajax/img/vue-Lazyloading/img/img12.jpg', loaded:false, num: '36972' },
+          { src: 'https://static.nowcoder.com/ajax/img/vue-Lazyloading/img/img13.jpg', loaded:false, num: '67355' }
+        ]);
+        const defaultUrl = 'https://static.nowcoder.com/ajax/img/vue-Lazyloading/img/loading.jpg';
+
+        // 懒加载图片的函数
+        const lazyLoadImages = () => {
+          const boxes = document.querySelectorAll('.box');
+          boxes.forEach((box, index) => {
+            const rect = box.getBoundingClientRect();
+            if (rect.top < window.innerHeight) {
+              content.value[index].loaded = true;
+            }
+          });
+        };
+
+        // 节流函数，用于限制函数的执行频率
+        const throttle = (func, delay) => {
+          let timeoutId;
+          return function () {
+            if (timeoutId) {
+              return;
+            }
+            timeoutId = setTimeout(() => {
+              func();
+              timeoutId = null;
+            }, delay);
+          };
+        };
+
+        // 处理滚动事件的函数
+        const handleScrollEvent = () => {
+          lazyLoadImages();
+          // 如果滚动到页面底部，移除滚动事件监听器，停止加载更多图片
+          if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+            window.removeEventListener('scroll', handleScrollEvent);
+          }
+        };
+
+        // 在Vue组件挂载完成后，添加滚动事件监听器
+        Vue.onMounted(() => {
+          window.addEventListener('scroll', throttle(handleScrollEvent, 200));
+        });
+
+        return {
+          content,
+          defaultUrl
+        };
+      }
+    });
+
+    app.mount('#example');
+  </script>
 </body>
+
 </html>
