@@ -244,8 +244,8 @@ function reverseTree(root){
 
     return root
 }
-// 数组转树
-function ArrayToTree(arrayData){
+// 树转数组
+function TreeToArray(arrayData){
     let result = []
     for(let i = 0;i<arrayData.length;i++){
         let item = arrayData[i]
@@ -257,4 +257,41 @@ function ArrayToTree(arrayData){
         }
     }
     return result
+}
+// 数组转树
+function ArrayToTree1(arr){
+    let root = []
+    let parent2ChildrenMap = {}
+    for(let i = 0;i<arr.length;i++){
+        let item = arr[i]
+        if(item.pid === null){
+            root.push(item)
+        }else{
+            if(!parent2ChildrenMap[item.pid]){
+                parent2ChildrenMap[item.pid]=[]
+            }
+            parent2ChildrenMap[item.pid].push(item)
+        }
+    }
+    for(let i = 0;i<arr.length;i++){
+        let item = arr[i]
+        if(parent2ChildrenMap[item.id]){
+            item.children = parent2ChildrenMap[item.id]
+        }
+    }
+    return root
+}
+
+// 数组转树2
+function ArrayToTree2(arr,parentId = null){
+    const tree = []
+    for(let i = 0;i<arr.length;i++){
+        const item = arr[i]
+        if(item.pid===parentId){
+            const child = ArrayToTree2(arr,item.pid)
+            const newItem = {...item,child}
+            tree.push(newItem)
+        }
+    }
+    return tree
 }
