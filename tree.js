@@ -295,3 +295,23 @@ function ArrayToTree2(arr,parentId = null){
     }
     return tree
 }
+function arrayToTree(arr) {
+    const map = {};
+    const roots = [];
+  
+    // 将数组中的每个元素创建成节点，并使用 id 作为键存储在 map 对象中
+    arr.forEach((item) => {
+      map[item.id] = { ...item, children: [] };
+    });
+  
+    // 遍历每个节点，将其添加到其父节点的 children 数组中
+    Object.values(map).forEach((node) => {
+      if (node.parentId !== null) {
+        map[node.parentId].children.push(node);
+      } else {
+        roots.push(node);
+      }
+    });
+  
+    return roots;
+  }
