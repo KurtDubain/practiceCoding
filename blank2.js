@@ -615,6 +615,7 @@ function permute(nums) {
     backtrack(0);
     return result;
   }
+  console.log(permute(1,2,3))
 // 8、对角线遍历数组
 function diagonalTraverse(matrix) {
     if (matrix.length === 0 || matrix[0].length === 0) {
@@ -689,7 +690,7 @@ function arrayToTree(arr) {
     { id: 7, parentId: 4, name: 'Node 7' },
     { id: 8, parentId: 5, name: 'Node 8' },
   ]
-  console.log(arrayToTree(arr))
+//   console.log(arrayToTree(arr))
 // 10、三数之和
 function threeSum(nums) {
     nums.sort((a, b) => a - b);  // 将数组进行排序
