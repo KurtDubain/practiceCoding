@@ -1,13 +1,97 @@
-function ArrayToTree(arrayData){
-    let result = []
-    for(let i = 0;i<arrayData.length;i++){
-        let item = arrayData[i]
-        let children = item.children
-        result.push(item)
-        if(children&&children.length>0){
-            result = result.concat(arrayData(children))
-        }
-    }
-    return result
-}
-console.log(ArrayToTree([{},{},{},{}]))
+// 1、LRU、最长不重复子串
+
+// 2、去掉连续的ac和b
+
+// 3、轮播图
+
+// 4、头部底部固定，中间两栏三栏布局
+
+// 5、vue3响应式
+
+// 6、PromiseAllSettled
+
+// 7、全排列
+
+// 8、对角线遍历数组
+
+// 9、数组转树
+
+// 10、三数之和
+
+// 11、快速幂乘法
+
+// 12、归并
+
+// 1、大数相加
+
+
+// 2、instanceof手写
+
+// 3、节流、防抖
+
+
+// 4、对象的dfs（递归、非递归）和bfs和层级遍历多叉树
+
+// 5、16进制转10进制
+
+// 6、解析数组（JSON.parse）
+
+
+// 7、手写固定和
+
+// 8、函数柯里化func(1)(2)(3)
+
+// 9、手写Promise以及then以及All
+
+
+// 10、长字符串在长文本中的查找
+
+// 11、实现LRU
+
+// 12、call、bind、apply方法手写
+
+
+
+// 13、深拷贝（解决循环应用）
+
+// 14、翻转二叉树
+
+// 15、零钱兑换
+
+// 16、-_转驼峰命名
+
+// 17、快排
+
+// 18、求每个元素在数组中比他小的其他元素的个数
+
+// 19、手写new和寄生组合式继承
+
+
+
+
+
+
+
+// 20、回文链表
+
+// 21、递归实现Pow方法
+
+// 22、跳台阶
+
+// 23、打家劫舍
+
+// 24、最长无重复子串
+
+// 25、千分位转换
+
+// 26、括号闭合问题
+
+// 27、EventBus
+
+// 28、Observer
+
+// 29、Promise的retry
+
+// 30、Promise的递归调用
+
+// 31、对象扁平化
