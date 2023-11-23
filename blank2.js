@@ -49,7 +49,7 @@ function debounce(func,delay){
         clearTimeout(timer)
         timer = setTimeout(()=>{
             func.apply(this,...args)
-        })
+        },delay)
     }
 }
 // 4、对象的dfs（递归、非递归）和bfs和层级遍历多叉树
