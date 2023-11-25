@@ -1,6 +1,6 @@
-# 简单学习一下Vue2的diff算法的原理
+# 简单学习一下Vue3的diff算法的原理
 
-本文主要介绍Vue2的核心代码和对比原理，同时会简单介绍一些Vue2diff的特性
+本文主要介绍Vue3的核心代码和对比原理，同时会简单介绍一些Vue3 diff的特性
 
 **对于文中不严谨的地方，还望大家评论指出**
 
@@ -10,13 +10,13 @@
 简单说明一下本文的目录：
 <div style="font-size:0.9rem">
 
->什么是diff，为什么要用
+>简述
 
 >实现原理（包含图示）
 
 >核心代码总结
 
->其他相关信息
+>Vue3的特性和优化之处（diff）
 </div>
 
 
@@ -125,109 +125,157 @@ Vue2的diff算法主要特点是“双端对比”。顾名思义，就是分别
 ## 核心源码
 
 <div style="max-width: 90%; overflow: auto;font-size:0.9rem"><pre><code class="language-javascript">
-// Vue2算法核心
-function updateChildren(el, oldChildren, newChildren) {
-    let oldStartIndex = 0; // 旧头指针
-    let oldStartVnode = oldChildren[0]; // 旧节点组的第一个节点
-    let oldEndIndex = oldChildren.length - 1; // 旧尾指针
-    let oldEndVnode = oldChildren[oldEndIndex] // 旧节点组的最后一个节点
-    let newStartIndex = 0; // 新头指针
-    let newStartVnode = newChildren[0]; // 新节点组的第一个节点
-    let newEndIndex = newChildren.length - 1; // 新尾指针
-    let newEndVnode = newChildren[newEndIndex] // 新节点组的最后一个节点
-    
-    // 创建Map映射表，来表示旧VNode的key和index的关系，用于后续使用
-    const makeIndexBykey = (children) => {
-      return children.reduce((memo, cur, index) => {
-        memo[cur.key] =  index
-        return memo
-      }, {})
-    }  
-    const keysMap = makeIndexBykey(oldChildren)
-    
-    // 循环判断，如果旧头在旧尾之前 且 新头在新尾之前，那么继续执行双端比较，否则结束比较
-    while(oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex) {
-       // 对于节点为undefined的情况，指针会跳过，指向下一个节点
-      if (!oldStartVnode) { 
-          // 旧头向后移动1个节点
-        oldStartVnode = oldChildren[++oldStartIndex]
-      } else if (!oldEndVnode) {
-          // 旧尾向前移动1个节点
-        oldEndVnode = oldChildren[--oldEndIndex]
-      }
-      // 如果新前和旧前相同
-      if (isSameVnode(oldStartVnode, newStartVnode)) { 
-        // 递归去比较当前的VNode以及VNode下的子节点
-        patch(oldStartVnode, newStartVnode)
-        // 新头、旧头后移，同时更新队列节点信息
-        oldStartVnode = oldChildren[++oldStartIndex]
-        newStartVnode = newChildren[++newStartIndex]
-      } else if (isSameVnode(oldEndVnode, newEndVnode)) {
-        // 新尾和旧尾相同
-        // 递归去比较当前的VNode以及VNode下的子节点
-        patch(oldEndVnode, newEndVnode)
-        // 新尾、旧尾前移，同时更新队列节点信息
-        oldEndVnode = oldChildren[--oldEndIndex]
-        newEndVnode = newChildren[--newEndIndex]
-      } else if (isSameVnode(oldStartVnode, newEndVnode)) { 
-        // 新尾和旧头相同
-        // 递归比较儿子以及他们的子节点
-        patch(oldStartVnode, newEndVnode)
-        // 移动真实DOM，将旧头所指向的节点移动到旧尾的后面
-        el.insertBefore(oldStartVnode.el, oldEndVnode.el.nextSibling)
-        // 旧头后移，更新队列
-        oldStartVnode = oldChildren[++oldStartIndex]
-        // 新尾前移，更新队列
-        newEndVnode = newChildren[--newEndIndex]
-      } else if (isSameVnode(oldEndVnode, newStartVnode)) { 
-        // 新头和旧尾相同
-        // 递归比较儿子以及他们的子节点
-        patch(oldEndVnode, newStartVnode)
-        // 移动真实DOM，将旧尾所指向的节点移动到旧头的前面
-        el.insertBefore(oldEndVnode.el, oldStartVnode.el)
-        // 旧尾前移，更新队列
-        oldEndVnode = oldChildren[--oldEndIndex]
-        // 新头后移，更新队列
-        newStartVnode = newChildren[++newStartIndex]
-      } else {
-        // 四种对比都不符合，使用暴力处理
-        // 以新头指向的节点为起始，去Map中查找
-        const moveIndex = keysMap[newStartVnode.key]
-        if (!moveIndex) { 
-          // 如果节点不能在Map中找到，需要将节点插入到DOM中
-          el.insertBefore(createElm(newStartVnode), oldStartVnode.el)
+  // Vue3 diff核心代码
+  // 获取新的子节点
+  const newChildren = n2.children;
+  // 获取老的子节点
+  const oldChildren = n1.children;
+  // 更新相同的前置节点
+  // 新，老开始节点的下标
+  let j = 0;
+  // 获取老的一组子节点的开始节点
+  let oldVnode = oldChildren[j];
+  // 获取新的一组子节点的开始节点
+  let newVnode = newChildren[j];
+  // 如果新，老的开始节点相同
+  while(oldVnode.key === newChildren.key) {
+    // 递归处理子节点
+    patch(oldVnode, newVnode, container);
+    // 下标往后移动一格
+    j++;
+    // 获取 +1 后的新，老节点
+    oldVnode = oldChildren[j];
+    newVnode = newChildren[j];
+  }
+  
+  // 更新相同的后置节点
+  // 索引 oldEnd 指向旧的一组子节点的最后一个节点
+  let oldEnd = oldChildren.length - 1;
+  // 索引 newEnd 指向新的一组子节点的最后一个节点
+  let newEnd = newChildren.length - 1;
+  // 获取新，老结束下标对应的节点
+  oldVnode = oldChildren[oldEnd];
+  newVnode = newChildren[newEnd];
+
+  // 如果新，老的结束节点相同
+  while(oldVnode.key === newVnode.key) {
+    // 递归处理子节点
+    patch(oldVnode, newVnode, container)
+    // 递减 oldEnd 和 nextEnd
+    oldEnd--
+    newEnd--
+    // 获取递减对应的节点
+    oldVnode = oldChildren[oldEnd]
+    newVnode = newChildren[newEnd]
+  }
+  // 预处理完毕后，如果满足如下条件，则说明从 j --> newEnd 之间的节点应该作为新节点插入
+  if (j > oldEnd && j <= newEnd) {
+    // 锚点的索引
+    const anchorIndex = newEnd + 1;
+    // 锚点元素
+    const anchor = anchorIndex < newChildren.length ? newChildren[anchorIndex].el : null;
+    // 采用 while 循环， 调用 patch 函数逐个挂载新增节点
+    while (j <= newEnd) {
+      patch(null, newChildren[j++], container, anchor)
+    }
+  } else if (j > newEnd && j <= oldEnd) {
+    // 如果满足如下条件以上条件，那么j --> oldEnd 之间的节点应该被卸载
+    while (j <= oldEnd) {
+        // 循环卸载多余节点
+      unmount(oldChildren[j++])
+    }
+  } else {
+    // 获取剩余新的一组子节点的个数
+    const count = newEnd - j + 1;
+    // 定义个长度为 count 的 数组，用于存放新的一组子节点在老的组中位置，果然没有的话就存-1
+    const source = new Array(count);
+    // 初始化都存放-1
+    source.fill(-1);
+
+    // oldStart 和 newStart 分别为起始索引，即j
+    const oldStart = j;
+    const newStart = j;
+    // 用于最后判断是否有要移动的节点
+    let moved = false;
+    // 用于存放寻找过程中找递增序列中最大索引值
+    let pos = 0;
+    // 循环新的一组的子节点，构建key 和 index 的映射表
+    const keyIndex = {};
+    for(let i = newStart; i <= newEnd; i++) {
+      keyIndex[newChildren[i].key] = i;
+    }
+    // 代表更新过的节点数量
+    let patched = 0;
+    // 遍历旧的一组子节点中剩余未处理的节点
+    for(let i = oldStart; i <= oldEnd; i++) {
+      oldVnode = oldChildren[i];
+      // 如果更新过的节点数量小于等于需要更新的节点数量，则执行更新
+      if (patched <= count) {
+         // 取出老节点在新节点的索引
+        const k = keyIndex[oldVnode.key];
+        if (typeof k !== 'undefined') {
+          newVnode = newChildren[k];
+           // 递归处理子节点
+          patch(oldVnode, newVnode, container);
+          // 每更新一个节点，都将 patched 变量 +1
+          patched++;
+          // 存放新的一组子节点在老的组中位置 
+          source[k - newStart] = i;
+          // 如果该节点新的位置小于最大的索引值,说明该节点往前移了
+          if (k < pos) {
+            moved = true
+          } else {
+            // 如果不是就把该位子存到pos，目前k是递增子节点中最大的索引
+            pos = k
+          }
         } else {
-           // 如果找到节点，那么取出
-          const moveNode = oldChildren[moveIndex] 
-          // 取出节点后需要将原来的节点对应的位置用undefined处理，防止Map塌陷，同时不影响其他节点的索引
-          oldChildren[moveIndex] = undefined
-          // 把取出的节点的真实dom插入到开始节点的真实dom前面
-          el.insertBefore(moveNode.el, oldStartVnode.el)
-          patch(newStartVnode, moveNode) //比较
+          // 没找到, 卸载该节点
+          unmount(oldVnode)
         }
-        // 新头后移，更新队列
-        newStartVnode = newChildren[++newStartIndex]
+      } else {
+        // 如果更新过的节点数量大于需要更新的节点数量，则卸载多余的节点
+        unmount(oldVnode)
       }
     }
-    // 当新VNode有剩余，需要进行插入处理
-    if (newStartIndex <= newEndIndex ) {
-      for (let i = newStartIndex; i <= newEndIndex; i++) {
-        // 这是一个优化写法 insertBefore的第一个参数是null等同于appendChild作用
-        // 看一下 结束指针的下一个元素是否存在
-        let anchor = newChildren[newEndIndex + 1] == null ? null : newChildren[newEndIndex + 1].el
-        el.insertBefore(createElm(newChildren[i]), anchor)
+  }
+   // moved 为 true 时说明需要移动节点 
+  if (moved) {
+    // 计算最长递增子序列
+    const seq = lis(source);
+    // 最长递增子序列中最后一个值的索引
+    let s = seq.length - 1;
+    // 新的一组子节点的最后一个节点的索引
+    let i = count - 1;
+    // 新的一组子节点从后往前遍历
+    for (i; i >=0; i--) {
+      if (source[i] === -1) {
+        // 说明索引为 i 的节点是全新的节点，应该将其插入
+        // 该节点在新 children 中的真实位置索引
+        const pos = i + newStart;
+        const newVnode = newChildren[pos];
+        // 该节点的下一个节点的位置索引；
+        const nextPos = pos + 1;
+        // 锚点
+        const anchor = nextPos < newChildren.length ? newChildren[nextPos].el : null;
+        // 挂载
+        patch(null, newVnode, container, anchor);
+      } else if(i !== seq[s]) {
+        // 如果节点的索引 i 不等于 seq[s] 的值， 说明该节点需要移动
+        // 该节点在新的一组子节中的真实位置索引
+        const pos = i + newStart;
+        const newVnode = newChildren[pos];
+        // 该节点的下一个节点的位置索引
+        const nextPos = pos + 1;
+        // 锚点
+        const anchor = nextPos < newChildren.length ? newChildren[nextPos].el : null;
+        // 移动
+        insert(newVnode.el, container, anchor)
+      } else {
+        // 当 i === seq[s] 时, 说明该位置的节点不需要移动，只需要让 s 指向下一个位置
+        s--
       }
     }
-    // 当旧VNode有剩余，需要进行删除处理
-    if (oldStartIndex <= oldEndIndex) {
-      for (let i = oldStartIndex; i <= oldEndIndex; i++) {
-         // 对于非占位节点，执行删除操作
-        if (oldChildren[i] != null) {
-          el.removeChild(oldChildren[i].el)
-        }
-      }
-    }
- }
+  }
     </code></pre></div>
 
 ***
