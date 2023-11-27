@@ -764,5 +764,43 @@ function mergeSort(arr) {
     return result.concat(left.slice(leftIndex)).concat(right.slice(rightIndex));
   }
   
-
+  function limitConcurrency(requests, limit) {
+    const results = [];  // 存储请求结果的数组
+    let running = 0;  // 当前正在执行的请求数量
+    let index = 0;  // 当前请求的索引
+  
+    async function runNext() {
+      if (index >= requests.length) {
+        return;  // 所有请求已经执行完毕
+      }
+  
+      const current = index++;  // 当前请求的索引自增
+      running++;  // 增加正在执行的请求数量
+  
+      try {
+        const result = await requests[current]();  // 执行当前请求
+        results[current] = result;  // 存储请求结果
+      } catch (error) {
+        results[current] = error;  // 存储请求错误信息
+      }
+  
+      running--;  // 当前请求执行完毕，减少正在执行的请求数量
+      runNext();  // 执行下一个请求
+    }
+  
+    // 启动初始的请求
+    while (running < limit && index < requests.length) {
+      runNext();
+    }
+  
+    // 返回一个 Promise，在所有请求执行完毕后进行 resolve
+    return new Promise((resolve) => {
+      const checkInterval = setInterval(() => {
+        if (index >= requests.length && running === 0) {
+          clearInterval(checkInterval);
+          resolve(results);
+        }
+      }, 10);
+    });
+  }
 
