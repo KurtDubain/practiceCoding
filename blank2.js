@@ -804,3 +804,36 @@ function mergeSort(arr) {
     });
   }
 
+  function limitConcurrency(urls, maxConcurrency) {
+    let runningCount = 0;
+    let index = 0;
+  
+    function runNext() {
+      if (runningCount >= maxConcurrency || index >= urls.length) {
+        return;
+      }
+  
+      const url = urls[index];
+      index++;
+      runningCount++;
+  
+      fetch(url)
+        .then((response) => {
+          // 处理请求成功的响应
+          console.log(`Fetched URL: ${url}`);
+        })
+        .catch((error) => {
+          // 处理请求失败的情况
+          console.error(`Error fetching URL: ${url}`, error);
+        })
+        .finally(() => {
+          runningCount--;
+          runNext(); // 运行下一个请求
+        });
+  
+      runNext(); // 启动下一个请求
+    }
+  
+    // 启动初始的请求
+    runNext();
+  }
