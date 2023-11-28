@@ -764,7 +764,7 @@ function mergeSort(arr) {
     return result.concat(left.slice(leftIndex)).concat(right.slice(rightIndex));
   }
   
-  function limitConcurrency(requests, limit) {
+function limitConcurrency(requests, limit) {
     const results = [];  // 存储请求结果的数组
     let running = 0;  // 当前正在执行的请求数量
     let index = 0;  // 当前请求的索引
@@ -802,9 +802,9 @@ function mergeSort(arr) {
         }
       }, 10);
     });
-  }
+}
 
-  function limitConcurrency(urls, maxConcurrency) {
+function limitConcurrency(urls, maxConcurrency) {
     let runningCount = 0;
     let index = 0;
   
@@ -836,4 +836,5 @@ function mergeSort(arr) {
   
     // 启动初始的请求
     runNext();
-  }
+}
+

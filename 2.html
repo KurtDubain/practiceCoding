@@ -5,55 +5,35 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-</head>
-<style>
-  .theGrandpa{
-    width: 500px;
-    height: 500px;
-    background-color:aqua;
-  }
-  .theDad{
-    width: 400px;
-    height: 400px;
-    background-color: blue;
-    margin: 0;
-  }
-  .theSon{
-    width: 300px;
-    height: 300px;
-    background-color: black;
-    margin: 0;
-  }
-  .theGrandSon{
-    width: 200px;
-    height: 200px;
-    background-color: blueviolet;
-    margin: 0;
-  }
-</style>
+    <style>
+      .container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+      }
 
+      header {
+        background-color: lightblue;
+        flex: 0 0 auto;
+      }
+
+      .content {
+        flex: 1 1 auto;
+        overflow: auto;
+      }
+
+      footer {
+        background-color: lightgray;
+        flex: 0 0 auto;
+      }
+    </style>
+</head>
 <body>
-  <div class="theGrandpa">
-    <div class="theDad">
-      <div class="theSon">
-        <div class="theGrandSon">click Me!
-        </div>
-      </div>
-    </div>
+  <div class="container">
+    <header>Header</header>
+    <div class="content">Content</div>
+    <footer>Footer</footer>
   </div>
 
-
-
-
-<!-- Initialize Quill editor -->
-<script>
-  function handleClick(event){
-    console.log('currentTarget is:',event.currentTarget)
-    console.log('the target is :',event.target)
-  }
-
-  const needClick = document.querySelector('.theGrandpa')
-  needClick.addEventListener('click',handleClick,true)
-</script>
 </body>
 </html>
