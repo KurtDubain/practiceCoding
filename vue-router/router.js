@@ -14,6 +14,7 @@ class Router {
     render() {
       const view = document.getElementById('app');
       const routeComponent = this.currentRoute ? new this.currentRoute.component() : null;
+      console.log('routeComponent.$el',routeComponent.$el)
       view.innerHTML = '';
       if (routeComponent) {
         view.appendChild(routeComponent.$el);
@@ -26,10 +27,14 @@ class Router {
     }
   
     beforeRouteEnterCallback(to, from, next) {
+      const continueNavigation = ()=>{
+        this.currentRoute = to
+        this.render()
+      }
       if (this.beforeEachCallback) {
-        this.beforeEachCallback(to, from, next);
+        this.beforeEachCallback(to, from, continueNavigation);
       } else {
-        next();
+        continueNavigation()
       }
     }
   
