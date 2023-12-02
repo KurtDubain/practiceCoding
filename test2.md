@@ -19,106 +19,90 @@
 >Vue3的特性和优化之处（diff）
 </div>
 
-
 ***
+
 ## 简述
 
-上一篇
+上一篇文章，主要讲了Vue2的Diff算法的实现过程，它的核心原理是“双端对比”，而本次文章主要讲解Vue3的Diff算法，它的核心原理则是“深度优先遍历”，然后逐一对比节点以及节点的类型、属性等，完成对比，进而进行节点的增删改查等操作，完成DOM渲染。
 
-Vue2的diff算法主要特点是“双端对比”。顾名思义，就是分别用头指针和尾指针分别指向新旧虚拟DOM，也就是一共四个指针，进行比对，最终获取对比结果。
-
-接下来详细讲讲Vue2的diff的具体实现过程：
+接下来详细讲讲Vue3的diff的具体实现过程：
 
 ***
+
 ## 实现过程
 <div style="font-size:0.9rem">
-就像上面提到的，双端对比用到了四个指针，分别指向新旧VNode的头部和尾部，为了方便，我先定义这四个指针分别为“新头”（newStartVnode）、“新尾”（newEndVnode）、“旧头”（oldStartVnode）、“旧尾”（oldEndVnode）。
+本次Diff算法是基于“深度优先遍历”的方式，首先会对新VNode和旧VNode的前置节点进行比对，无变化的话会继续更新对比下一个前置节点（后移一位），如果遇到了不同的节点，则会开始从后置节点进行对比，直到遇到遇到不同节点；然后根据新旧VNode的剩余情况进行插入或删除操作，最后获取所有需要更新的部分，更新DOM。
 <div style="text-align:center">
 <img src="https://www.dyp02.vip/assets/imageForOwners/13_1.jpeg " style="max-width:90%; height: auto;" >
 </div>
-这四个指针的对比流程如下：
+具体流程如下：
 
-- 新头对比旧头
-- 新尾对比旧尾
-- 新尾对比旧头
-- 新头对比旧尾
-- 暴力查找
-
-在对比之后，会根据新VNode或者旧VNode是否有剩余来进行插入或删除操作，最后完成更新
+- 前置节点对比
+- 后置节点对比
+- 剩余节点判断
+- 如果只有新VNode剩余，按次序插入
+- 如果只有旧VNode剩余，删除旧节点
+- 如果双方互有剩余，使用Map来确定哪个节点需要进行插入
 
 </div>
 
-### 新头对比旧头&&新尾对比旧尾
+### 前置节点对比
 <div style="text-align:center">
 <img src="https://www.dyp02.vip/assets/imageForOwners/13_2.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
-- 首先对比新头和旧头，如果无差异，那么保存节点，两个头指针后移，重复执行；
+- 从前置节点开始对比，如果对比没有区别，则添加到更新队列中
 
 <div style="text-align:center">
 <img src="https://www.dyp02.vip/assets/imageForOwners/13_3.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
-- 如果新头和旧头存在差异无法复用节点，那么对比新尾和旧尾，同理，如果无差异，那么保存节点，两个尾指针前移
+- 如果对比出现不同，则停止遍历对比，开始进行后置节点对比
 
-<div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/13_4.jpeg " style="max-width:90%; height: auto;" >
-</div>
-
-- 以上是经历过一次新头旧头对比和一次新尾旧尾对比的结果
-
-### 新尾对比旧头&&新头对比旧尾
+### 后置节点对比
 
 <div style="text-align:center">
 <img src="https://www.dyp02.vip/assets/imageForOwners/13_5.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
-- 如果经历了上述的前两次对比之后，发现两次结果都是有差异，那么就会执行新尾对比旧头的操作，如果无差异，那么保存节点，同时头指针后移，尾指针前移
+- 在前置节点对比不同之后，会开始进行后置节点对比，类似前置节点对比一样，如果后置节点对比过程中相同，则将节点加入更新队列；
 <div style="text-align:center">
 <img src="https://www.dyp02.vip/assets/imageForOwners/13_6.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
-- 同理，如果上述三次对比都有差异，那么就会进行新头和旧尾的对比，如果无差异，那么保存节点，同时头指针后移，尾指针前移
+- 如果在后置对比的时候，如果对比结果不同，则开始进行剩余节点情况的判断，退出后置节点对比的过程。
 
-### 暴力对比
+### 剩余节点情况-只有新VNode有剩余
 
 <div style="text-align:center">
 <img src="https://www.dyp02.vip/assets/imageForOwners/13_7.jpeg " style="max-width:90%; height: auto;" >
 </div>
-如果上述四次对比都存在差异，无法直接通过双端对比来获取可复用节点，那么就需要结合旧VNode的Map图，来判断新头指向的节点是否存在于旧VNode中，如果存在，则复用，否则需要新插入一个节点；至于所谓的Map图，是节点的key和index的集合，结合上图，可以用如下方式表示：
 
-```
-{
-    A:1,
-    B:2,
-    C:3,
-    D:4
-}
-//其中，B节点位于Map中，index为2，可以复用
-```
+- 当后置对比之后，新VNode仍由剩余，则会进行插入操作。此时会遍历剩余新节点，进行处理，更新补丁；
 
-### 剩余节点处理
-
-在进行了双端对比之后，可能会出现以下三种情况：
-
-- 新旧VNode全部处理完毕（新头>新尾&&旧头>旧尾&&指向的节点已经全部处理），没有剩余
+### 剩余节点情况-只有旧VNode有剩余
 
 <div style="text-align:center">
 <img src="https://www.dyp02.vip/assets/imageForOwners/13_8.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
-- 如果旧VNode有剩余（新头>新尾&&新指针节点全部处理完毕&&旧指针节点未处理），那么：
+- 当前置对比之后，旧VNode仍由剩余，此时会遍历剩余旧节点，进行删除；
 
-循环这些剩余未处理的节点，删除对应的节点，不需要添加到最后的补丁中
+
+***
+### 剩余节点情况-新旧VNode都有剩余
 
 <div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/13_9.jpeg " style="max-width:90%; height: auto;" >
+<img src="https://www.dyp02.vip/assets/imageForOwners/13_8.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
-- 如果新VNode有剩余（旧头>旧尾&&旧指针节点全部处理完毕&&新指针节点未处理），那么：
+- 当新旧节点都有剩余的时候，需要构建一个source数组，用于表示新的一组节点在旧VNode中的位置，初始化所有值为-1。构建source完成之后，遍历新VNode来描述新VNode中节点以及其对应的位置关系，另外遍历旧VNode来寻找对应节点，如果能找到，则将对应的节点在旧VNode中的位置，更新到source中；如果没有找到对应的节点则将这个节点删除。最终构建完整的source。
 
-循环这些剩余未处理的节点，根据他们的key和index值来进行相应位置的插入，添加到渲染补丁中
+<div style="text-align:center">
+<img src="https://www.dyp02.vip/assets/imageForOwners/13_8.jpeg " style="max-width:90%; height: auto;" >
+</div>
 
+- 
 
 ***
 
@@ -147,7 +131,6 @@ Vue2的diff算法主要特点是“双端对比”。顾名思义，就是分别
     oldVnode = oldChildren[j];
     newVnode = newChildren[j];
   }
-  
   // 更新相同的后置节点
   // 索引 oldEnd 指向旧的一组子节点的最后一个节点
   let oldEnd = oldChildren.length - 1;
@@ -191,7 +174,6 @@ Vue2的diff算法主要特点是“双端对比”。顾名思义，就是分别
     const source = new Array(count);
     // 初始化都存放-1
     source.fill(-1);
-
     // oldStart 和 newStart 分别为起始索引，即j
     const oldStart = j;
     const newStart = j;
@@ -280,7 +262,7 @@ Vue2的diff算法主要特点是“双端对比”。顾名思义，就是分别
 
 ***
 
-## Vue2的diff算法的特点
+## Vue3的diff算法的特点
 
 1. 双指针比较（核心：双端比较）
 2. 组件级更新（从组件根节点遍历，然后递归遍历子节点）
