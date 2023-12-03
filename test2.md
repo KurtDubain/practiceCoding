@@ -96,13 +96,24 @@
 <img src="https://www.dyp02.vip/assets/imageForOwners/13_8.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
-- 当新旧节点都有剩余的时候，需要构建一个source数组，用于表示新的一组节点在旧VNode中的位置，初始化所有值为-1。构建source完成之后，遍历新VNode来描述新VNode中节点以及其对应的位置关系，另外遍历旧VNode来寻找对应节点，如果能找到，则将对应的节点在旧VNode中的位置，更新到source中；如果没有找到对应的节点则将这个节点删除。最终构建完整的source。
+- 当新旧节点都有剩余的时候，需要构建一个source数组，用于表示新的一组节点在旧VNode中的位置，初始化所有值为-1。构建时，首先遍历新的一组子节点，构建其key和index的映射表keyIndex，即通过key将新的子节点的索引存储起来，方便后续根据key查找对应的索引。
 
 <div style="text-align:center">
 <img src="https://www.dyp02.vip/assets/imageForOwners/13_8.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
-- 
+- 然后遍历旧VNode中的节点，同时进行判断：
+- 如果更新过的节点数量patched小于count，也就是说明节点需要更新。首先需要根据节点的key在keyIndex中查找对应的索引k——并根据索引k获取newVnode，执行patch处理。然后将对应的节点索引i存储到source中，位置为k-newStart。
+
+> 如果该节点的新位置k小于之前的最大索引pos，则说明该节点需要移动，将moved设置为true。
+
+> 如果该节点的新位置k大于等于之前的最大索引pos，则更新pos=k
+
+<div style="text-align:center">
+<img src="https://www.dyp02.vip/assets/imageForOwners/13_8.jpeg " style="max-width:90%; height: auto;" >
+</div>
+
+- 如果patched大于count，则说明更新过的节点大于了需要更新的节点数量，表示节点是多余的节点，需要进行卸载处理
 
 ***
 
@@ -110,71 +121,72 @@
 
 <div style="max-width: 90%; overflow: auto;font-size:0.9rem"><pre><code class="language-javascript">
   // Vue3 diff核心代码
-  // 获取新的子节点
+  // 初始化新VNode内容
   const newChildren = n2.children;
-  // 获取老的子节点
+  // 初始化旧VNode内容
   const oldChildren = n1.children;
-  // 更新相同的前置节点
-  // 新，老开始节点的下标
+  // 进入前置节点对比过程
+  // 初始化一个前置指针j
   let j = 0;
-  // 获取老的一组子节点的开始节点
+  // 初始化旧VNode的前置节点
   let oldVnode = oldChildren[j];
-  // 获取新的一组子节点的开始节点
+  // 初始化新VNode的前置节点
   let newVnode = newChildren[j];
-  // 如果新，老的开始节点相同
+  // 开始对比，如果相等，则递归处理，后置对比
   while(oldVnode.key === newChildren.key) {
-    // 递归处理子节点
+    // 递归处理两个节点的内容
     patch(oldVnode, newVnode, container);
-    // 下标往后移动一格
+    // 节点指针j后移
     j++;
-    // 获取 +1 后的新，老节点
+    // 更新新旧前置节点
     oldVnode = oldChildren[j];
     newVnode = newChildren[j];
   }
-  // 更新相同的后置节点
-  // 索引 oldEnd 指向旧的一组子节点的最后一个节点
+  // 进入后置节点对比过程
+  // 初始化旧VNode后置节点指针
   let oldEnd = oldChildren.length - 1;
-  // 索引 newEnd 指向新的一组子节点的最后一个节点
+  // 初始化新VNode后置节点指针
   let newEnd = newChildren.length - 1;
-  // 获取新，老结束下标对应的节点
+  // 初始化后置节点
   oldVnode = oldChildren[oldEnd];
   newVnode = newChildren[newEnd];
-
-  // 如果新，老的结束节点相同
+  // 对比后置节点
   while(oldVnode.key === newVnode.key) {
-    // 递归处理子节点
+    // 如果相同，开始递归比较
     patch(oldVnode, newVnode, container)
-    // 递减 oldEnd 和 nextEnd
+    // 前移后置指针
     oldEnd--
     newEnd--
-    // 获取递减对应的节点
+    // 更新要对比的后置节点
     oldVnode = oldChildren[oldEnd]
     newVnode = newChildren[newEnd]
   }
-  // 预处理完毕后，如果满足如下条件，则说明从 j --> newEnd 之间的节点应该作为新节点插入
+  // 进入剩余节点情况处理
+  // 如果旧VNode已经被全部处理，而新VNode有剩余
   if (j > oldEnd && j <= newEnd) {
-    // 锚点的索引
+    // 更新要处理的元素的索引
     const anchorIndex = newEnd + 1;
-    // 锚点元素
+    // 获取对应的元素
     const anchor = anchorIndex < newChildren.length ? newChildren[anchorIndex].el : null;
-    // 采用 while 循环， 调用 patch 函数逐个挂载新增节点
+    // 遍历剩余新VNode节点，将其挂载
     while (j <= newEnd) {
       patch(null, newChildren[j++], container, anchor)
     }
   } else if (j > newEnd && j <= oldEnd) {
-    // 如果满足如下条件以上条件，那么j --> oldEnd 之间的节点应该被卸载
+    // 当新VNode被全部处理完毕而旧VNode仍有剩余
     while (j <= oldEnd) {
-        // 循环卸载多余节点
+        // 将剩余的就节点卸载
       unmount(oldChildren[j++])
     }
   } else {
-    // 获取剩余新的一组子节点的个数
+    // 当新旧VNode互有剩余
+    // 计算获取新VNode节点数量
     const count = newEnd - j + 1;
-    // 定义个长度为 count 的 数组，用于存放新的一组子节点在老的组中位置，果然没有的话就存-1
+    // 构建source数组，用于表示新节点在旧VNode中的索引位置，如果为-1则表示为新增节点
     const source = new Array(count);
-    // 初始化都存放-1
+    // 初始化所有节点的索引为-1
     source.fill(-1);
-    // oldStart 和 newStart 分别为起始索引，即j
+    // 初始化新旧剩余节点的索引
     const oldStart = j;
     const newStart = j;
     // 用于最后判断是否有要移动的节点
