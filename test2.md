@@ -115,6 +115,18 @@
 
 - 如果patched大于count，则说明更新过的节点大于了需要更新的节点数量，表示节点是多余的节点，需要进行卸载处理
 
+<div style="text-align:center">
+<img src="https://www.dyp02.vip/assets/imageForOwners/13_8.jpeg " style="max-width:90%; height: auto;" >
+</div>
+
+- 最后，进行对moved的判定，如果为true，则开始计算source的最长递增子序列seq，并获取最后一个值的索引s，然后从新的一组子节点的最后一个节点开始，更具source的值进行判断：
+
+>如果source[i]===-1，说明索引为i的节点是全新的节点，应该将其插入到container中
+
+>如果i不等于seq[s]，说明节点需要移动。获取节点的位置索引pos和下一个节点的位置索引nextPos，然后调用insert函数将节点移动到正确的位置上
+
+>如果i===seq[s]，说明该位置的节点不需要移动，只需要将s指向下一个位置
+
 ***
 
 ## 核心源码
@@ -193,79 +205,79 @@
     let moved = false;
     // 用于存放寻找过程中找递增序列中最大索引值
     let pos = 0;
-    // 循环新的一组的子节点，构建key 和 index 的映射表
+    // 构建新VNode剩余节点的key和index映射表
     const keyIndex = {};
     for(let i = newStart; i <= newEnd; i++) {
       keyIndex[newChildren[i].key] = i;
     }
-    // 代表更新过的节点数量
+    // 表示已经处理过的节点数量（用于和count对比）
     let patched = 0;
-    // 遍历旧的一组子节点中剩余未处理的节点
+    // 遍历处理旧VNode中的剩余节点
     for(let i = oldStart; i <= oldEnd; i++) {
       oldVnode = oldChildren[i];
-      // 如果更新过的节点数量小于等于需要更新的节点数量，则执行更新
+      // 如果已经处理过的节点小于剩余节点数量，开始处理
       if (patched <= count) {
-         // 取出老节点在新节点的索引
+         // 获取旧VNode在新VNode中的索引k
         const k = keyIndex[oldVnode.key];
         if (typeof k !== 'undefined') {
           newVnode = newChildren[k];
-           // 递归处理子节点
+           // 递归处理更新的节点
           patch(oldVnode, newVnode, container);
-          // 每更新一个节点，都将 patched 变量 +1
+          // 更新patched
           patched++;
           // 存放新的一组子节点在老的组中位置 
           source[k - newStart] = i;
-          // 如果该节点新的位置小于最大的索引值,说明该节点往前移了
+          // 如果节点的新位置小于最大索引值pos，则表示需要进行移动
           if (k < pos) {
             moved = true
           } else {
-            // 如果不是就把该位子存到pos，目前k是递增子节点中最大的索引
+            // 如果不是就把最大索引值更新成k
             pos = k
           }
         } else {
-          // 没找到, 卸载该节点
+          // 若没找到，就卸载节点
           unmount(oldVnode)
         }
       } else {
-        // 如果更新过的节点数量大于需要更新的节点数量，则卸载多余的节点
+        // 如果已经更新的数量大于剩余节点的数量，卸载节点
         unmount(oldVnode)
       }
     }
   }
-   // moved 为 true 时说明需要移动节点 
+   // 当moved为true的时候，开始处理节点的位移操作
   if (moved) {
-    // 计算最长递增子序列
+    // 利用lis方法计算source的最长递增子序列
     const seq = lis(source);
-    // 最长递增子序列中最后一个值的索引
+    // 最长子序列中的最后一个指针
     let s = seq.length - 1;
-    // 新的一组子节点的最后一个节点的索引
+    // 待处理节点的最后一个指针
     let i = count - 1;
-    // 新的一组子节点从后往前遍历
+    // 遍历待处理节点，从后往前遍历
     for (i; i >=0; i--) {
       if (source[i] === -1) {
-        // 说明索引为 i 的节点是全新的节点，应该将其插入
-        // 该节点在新 children 中的真实位置索引
+        // 当对应的节点的index为-1，表示该节点需要执行插入操作
+        // 获取当前节点在新VNode中的位置
         const pos = i + newStart;
         const newVnode = newChildren[pos];
-        // 该节点的下一个节点的位置索引；
+        // 计算当前节点的下一个节点索引
         const nextPos = pos + 1;
-        // 锚点
+        // 用anchor表示节点的确定插入位置
         const anchor = nextPos < newChildren.length ? newChildren[nextPos].el : null;
-        // 挂载
+        // 挂载节点，表示当前没有旧的虚拟节点需要更新到anchor为止，将新节点插入到目标容器中
         patch(null, newVnode, container, anchor);
       } else if(i !== seq[s]) {
-        // 如果节点的索引 i 不等于 seq[s] 的值， 说明该节点需要移动
-        // 该节点在新的一组子节中的真实位置索引
+        // 此时表示当前节点需要进行移动操作
+        // 计算节点在新VNode中的位置
         const pos = i + newStart;
         const newVnode = newChildren[pos];
         // 该节点的下一个节点的位置索引
         const nextPos = pos + 1;
-        // 锚点
+        // 挂载节点，表示当前没有旧的虚拟节点需要更新到anchor为止，将新节点插入到目标容器中
         const anchor = nextPos < newChildren.length ? newChildren[nextPos].el : null;
-        // 移动
+        // 将已有节点进行位置的新插入
         insert(newVnode.el, container, anchor)
       } else {
-        // 当 i === seq[s] 时, 说明该位置的节点不需要移动，只需要让 s 指向下一个位置
+        // 此时 i === seq[s] , 表示当前节点的位置无需更新位置，此时更新最长子序列的指针
         s--
       }
     }
@@ -276,12 +288,11 @@
 
 ## Vue3的diff算法的特点
 
-1. 双指针比较（核心：双端比较）
-2. 组件级更新（从组件根节点遍历，然后递归遍历子节点）
-3. 数组渲染优化（重复使用已存在的节点，避免不必要的更新）
+1. 递归比较，利用最长递增子序列优化对比逻辑；
+2. 静态标记，Vue3会在编译阶段会对模版进行静态分析，并标记处静态节点和静态属性，静态节点在更新时不会进行diff操作，可以直接复用（对比Vue2的全量对比）；
 
 ***
 
 ## 写在最后
 
-本文主要是简述了Vue2的diff的流程，具体细节可能描述较少，同时偏向口语化，注重算法的整体理解而不具有太强的专业性，更多的是自己参考源码和网上博客等资料做的一个自我总结，如果有更好的建议，欢迎大家在评论区提出
+本文主要是简述了Vue3的diff的流程，可能理解的不是很到位，欢迎评论区进行展开讨论！
