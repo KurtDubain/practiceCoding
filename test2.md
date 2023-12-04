@@ -34,7 +34,7 @@
 <div style="font-size:0.9rem">
 本次Diff算法是基于“深度优先遍历”的方式，首先会对新VNode和旧VNode的前置节点进行比对，无变化的话会继续更新对比下一个前置节点（后移一位），如果遇到了不同的节点，则会开始从后置节点进行对比，直到遇到遇到不同节点；然后根据新旧VNode的剩余情况进行插入或删除操作，最后获取所有需要更新的部分，更新DOM。
 <div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/13_1.jpeg " style="max-width:90%; height: auto;" >
+<img src="https://www.dyp02.vip/assets/imageForOwners/14_1.jpeg " style="max-width:90%; height: auto;" >
 </div>
 具体流程如下：
 
@@ -49,13 +49,13 @@
 
 ### 前置节点对比
 <div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/13_2.jpeg " style="max-width:90%; height: auto;" >
+<img src="https://www.dyp02.vip/assets/imageForOwners/14_2.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
 - 从前置节点开始对比，如果对比没有区别，则添加到更新队列中
 
 <div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/13_3.jpeg " style="max-width:90%; height: auto;" >
+<img src="https://www.dyp02.vip/assets/imageForOwners/14_3.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
 - 如果对比出现不同，则停止遍历对比，开始进行后置节点对比
@@ -63,12 +63,12 @@
 ### 后置节点对比
 
 <div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/13_5.jpeg " style="max-width:90%; height: auto;" >
+<img src="https://www.dyp02.vip/assets/imageForOwners/14_5.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
 - 在前置节点对比不同之后，会开始进行后置节点对比，类似前置节点对比一样，如果后置节点对比过程中相同，则将节点加入更新队列；
 <div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/13_6.jpeg " style="max-width:90%; height: auto;" >
+<img src="https://www.dyp02.vip/assets/imageForOwners/14_6.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
 - 如果在后置对比的时候，如果对比结果不同，则开始进行剩余节点情况的判断，退出后置节点对比的过程。
@@ -76,7 +76,7 @@
 ### 剩余节点情况-只有新VNode有剩余
 
 <div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/13_7.jpeg " style="max-width:90%; height: auto;" >
+<img src="https://www.dyp02.vip/assets/imageForOwners/14_7.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
 - 当后置对比之后，新VNode仍由剩余，则会进行插入操作。此时会遍历剩余新节点，进行处理，更新补丁；
@@ -84,7 +84,7 @@
 ### 剩余节点情况-只有旧VNode有剩余
 
 <div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/13_8.jpeg " style="max-width:90%; height: auto;" >
+<img src="https://www.dyp02.vip/assets/imageForOwners/14_8.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
 - 当前置对比之后，旧VNode仍由剩余，此时会遍历剩余旧节点，进行删除；
@@ -94,13 +94,13 @@
 ### 剩余节点情况-新旧VNode都有剩余
 
 <div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/13_8.jpeg " style="max-width:90%; height: auto;" >
+<img src="https://www.dyp02.vip/assets/imageForOwners/14_8.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
 - 当新旧节点都有剩余的时候，需要构建一个source数组，用于表示新的一组节点在旧VNode中的位置，初始化所有值为-1。构建时，首先遍历新的一组子节点，构建其key和index的映射表keyIndex，即通过key将新的子节点的索引存储起来，方便后续根据key查找对应的索引。
 
 <div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/13_8.jpeg " style="max-width:90%; height: auto;" >
+<img src="https://www.dyp02.vip/assets/imageForOwners/14_9.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
 - 然后遍历旧VNode中的节点，同时进行判断：
@@ -110,14 +110,10 @@
 
 > 如果该节点的新位置k大于等于之前的最大索引pos，则更新pos=k
 
-<div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/13_8.jpeg " style="max-width:90%; height: auto;" >
-</div>
-
 - 如果patched大于count，则说明更新过的节点大于了需要更新的节点数量，表示节点是多余的节点，需要进行卸载处理
 
 <div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/13_8.jpeg " style="max-width:90%; height: auto;" >
+<img src="https://www.dyp02.vip/assets/imageForOwners/14_10.jpeg " style="max-width:90%; height: auto;" >
 </div>
 
 - 最后，进行对moved的判定，如果为true，则开始计算source的最长递增子序列seq，并获取最后一个值的索引s，然后从新的一组子节点的最后一个节点开始，更具source的值进行判断：
