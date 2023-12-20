@@ -5,172 +5,29 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <style>
-      .date-picker {
-        position: relative;
-        display: inline-block;
-      }
-
-      .date-input {
-        padding: 5px;
-      }
-
-      .calendar {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 200px;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        display: none;
-      }
-
-      .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 5px;
-        background-color: #f0f0f0;
-      }
-
-      .prev-btn,
-      .next-btn {
-        border: none;
-        background-color: transparent;
-        cursor: pointer;
-      }
-
-      .days {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 2px;
-        padding: 5px;
-      }
-
-      .days button {
-        border: none;
-        background-color: transparent;
-        cursor: pointer;
-      }
-
-      .selected-day {
-        background-color: #ccc;
-      }
-    </style>
-</head>
-<body>
-  <div class="date-picker">
-    <input type="text" class="date-input" readonly aria-label="sda">
-    <div class="calendar">
-      <div class="header">
-        <button class="prev-btn">&lt;</button>
-        <div class="month-year"></div>
-        <button class="next-btn">&gt;</button>
-      </div>
-      <div class="days"></div>
-    </div>
-  </div>
-  <script>
-    // 获取日期选择器组件的元素
-    const datePicker = document.querySelector('.date-picker');
-    const dateInput = datePicker.querySelector('.date-input');
-    const calendar = datePicker.querySelector('.calendar');
-    const prevBtn = datePicker.querySelector('.prev-btn');
-    const nextBtn = datePicker.querySelector('.next-btn');
-    const monthYearText = datePicker.querySelector('.month-year');
-    const daysContainer = datePicker.querySelector('.days');
-
-    // 日期对象操作辅助函数
-    const formatDate = (date) => {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    };
-
-    const parseDate = (dateString) => {
-      const [year, month, day] = dateString.split('-');
-      return new Date(year, month - 1, day);
-    };
-
-    // 初始化日期选择器
-    const today = new Date();
-    let selectedDate = today;
-
-    dateInput.value = formatDate(today);
-
-    // 显示日历
-    const showCalendar = () => {
-      calendar.style.display = 'block';
-    };
-
-    // 隐藏日历
-    const hideCalendar = () => {
-      calendar.style.display = 'none';
-    };
-
-    // 更新日历显示
-    const updateCalendar = () => {
-      const year = selectedDate.getFullYear();
-      const month = selectedDate.getMonth();
-
-      monthYearText.textContent = `${year}年 ${month + 1}月`;
-
-      const firstDayOfMonth = new Date(year, month, 1).getDay();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-      daysContainer.innerHTML = '';
-
-      // 添加空白占位
-      for (let i = 0; i < firstDayOfMonth; i++) {
-        const emptyDay = document.createElement('button');
-        emptyDay.disabled = true;
-        daysContainer.appendChild(emptyDay);
-      }
-
-      // 添加日期按钮
-      for (let i = 1; i <= daysInMonth; i++) {
-        const dayButton = document.createElement('button');
-        dayButton.textContent = i;
-        dayButton.addEventListener('click', () => {
-          selectedDate = new Date(year, month, i);
-          dateInput.value = formatDate(selectedDate);
-          hideCalendar();
-        });
-        daysContainer.appendChild(dayButton);
-      }
-
-      // 添加样式给选中的日期按钮
-      const selectedDayButton = daysContainer.querySelector('.selected-day');
-      if (selectedDayButton) {
-        selectedDayButton.classList.remove('selected-day');
-      }
-      const currentDayButton = daysContainer.querySelector(`button:nth-child(${firstDayOfMonth + today.getDate()})`);
-      currentDayButton.classList.add('selected-day');
-    };
-
-    // 事件监听器
-    dateInput.addEventListener('click', showCalendar);
-    prevBtn.addEventListener('click', () => {
-      selectedDate.setMonth(selectedDate.getMonth() - 1);
-      updateCalendar();
-    });
-    nextBtn.addEventListener('click', () => {
-      selectedDate.setMonth(selectedDate.getMonth() + 1);
-      updateCalendar();
-    });
-
-    // 初始化日历
-    updateCalendar();
-
-    // 点击其他地方隐藏日历
-    document.addEventListener('click', (event) => {
-      const targetElement = event.target;
-      if (!datePicker.contains(targetElement)) {
-        hideCalendar();
-      }
-    });
-  </script>
+    <body>
+        <canvas id="c"></canvas>
+        <script>
+	var b = document.body;
+	var c = document.getElementsByTagName('canvas')[0];
+	var a = c.getContext('2d');
+	document.body.clientWidth;</script>
+ 
+        <script>
+with (m = Math)
+    C = cos, S = sin, P = pow, R = random;
+c.width = c.height = f = 500;
+h = -250;
+function p(a, b, c) {
+    if (c > 60)
+        return [ S(a * 7) * (13 + 5 / (.2 + P(b * 4, 4))) - S(b) * 50,
+                b * f + 50,
+                625 + C(a * 7) * (13 + 5 / (.2 + P(b * 4, 4))) + b * 400,
+                a * 1 - b / 2, a ];
+    A = a * 2 - 1;
+    B = b * 2 - 1;
+if(A*A+B*B<1){if(c>37){n=(j=c&1)?6:4;o=.5/(a+.01)+C(b*125)*3-a*300;w=b*h;return[o*C(n)+w*S(n)+j*610-390,o*S(n)-w*C(n)+550-j*350,1180+C(B+A)*99-j*300,.4-a*.1+P(1-B*B,-h*6)*.15-a*b*.4+C(a+b)/5+P(C((o*(a+1)+(B>0?w:-w))/25),30)*.1*(1-B*B),o/1e3+.7-o*w*3e-6]}if(c>32){c=c*1.16-.15;o=a*45-20;w=b*b*h;z=o*S(c)+w*C(c)+620;return[o*C(c)-w*S(c),28+C(B*.5)*99-b*b*b*60-z/2-h,z,(b*b*.3+P((1-(A*A)),7)*.15+.3)*b,b*.7]}o=A*(2-b)*(80-c*2);w=99-C(A)*120-C(b)*(-h-c*4.9)+C(P(1-b,7))*50+c*2;z=o*S(c)+w*C(c)+700;return[o*C(c)-w*S(c),B*99-C(P(b, 7))*50-c/3-z/1.35+450,z,(1-b/1.2)*.9+a*.1, P((1-b),20)/4+.05]}}setInterval('for(i=0;i<1e4;i++)if(s=p(R(),R(),i%46/.74)){z=s[2];x=~~(s[0]*f/z-h);y=~~(s[1]*f/z-h);if(!m[q=y*f+x]|m[q]>z)m[q]=z,a.fillStyle="rgb("+~(s[3]*h)+","+~(s[4]*h)+","+~(s[3]*s[3]*-80)+")",a.fillRect(x,y,1,1)}',0)</script>
+    
 
 </body>
 </html>
