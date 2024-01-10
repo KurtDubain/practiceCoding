@@ -1,6 +1,6 @@
-function myMap(arr, callback) {
-  return arr.reduce((result, current) => {
-    result.push(callback(current));
-    return result;
-  }, []);
+
+const obj= {
+  a:12,
+  "sda":"da"
 }
+console.log(typeof(JSON.stringify(obj)))
