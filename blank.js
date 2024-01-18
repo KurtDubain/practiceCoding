@@ -5,14 +5,38 @@ function bigNumAdd(str1,str2){
 
 // 2、instanceof手写
 function NewInstanceof(obj,constructor){
-
+    if(obj===null||typeof obj !=="object"){
+        return false
+    }
+    let prototype = Object.getPrototypeOf(obj)
+    while(prototype!==null){
+        if(prototype===constructor.prototype){
+            return true
+        }
+        prototype = Object.getPrototypeOf(prototype)
+    }
+    return false
 }
 // 3、节流、防抖
 function throttle(func,delay){
-
+    let timer = null
+    return function(...args){
+        if(!timer){
+            timer = setTimeout(()=>{
+                func.apply(this,...args)
+                timer = null
+            },delay)
+        }
+    }
 }
 function debounce(func,delay){
-
+    let timer
+    return function(...args){
+        clearTimeout(timer)
+        timer = setTimeout(()=>{
+            func.apply(this,...args)
+        },delay)
+    }
 }
 // 4、对象的dfs（递归、非递归）和bfs和层级遍历多叉树
 function dfsObj1(obj){
@@ -29,7 +53,14 @@ function bfsMuchTree(root){
 }
 // 5、16进制转10进制
 function Ch16To10(str){
-
+    let str = '0123456789ABCDEF'
+    let result = 0
+    for(let i = 0;i<str.length;i++){
+        const curNum = str[i]
+        const curInt = str.indexOf(curNum.toUpperCase())
+        result = result+16*curInt
+    }
+    return result
 }
 // 6、解析数组（JSON.parse）
 function parseArr(str){
@@ -94,7 +125,12 @@ class LRUCache{
 }
 // 12、call、bind、apply方法手写
 function myCall(context,arg){
-
+    context = context||window
+    const fn = Symbol('fn')
+    context[fn] = this
+    const result = context[fn](arg)
+    delete context[fn]
+    return result
 }
 function myApply(context,...args){
 
