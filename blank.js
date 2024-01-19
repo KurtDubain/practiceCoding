@@ -239,20 +239,14 @@ function myApply(context,...args){
 }
 // 13、深拷贝（解决循环应用）
 function Deepclone(obj,visited = new Map()){
-    if(typeof obj !=='object'||obj===null){
+    if(typeof obj !=='object'&&obj===null){
         return obj
     }
     if(visited.has(obj)){
         return visited.get(obj)
     }
-    const cloneObj = Array.isArray(obj)?[]:{}
-    visited.set(obj,cloneObj)
-    for(let key in obj){
-        if(obj.hasOwnProperty(key)){
-            cloneObj[key] = Deepclone(obj[key],visited)
-        }
-    }
-    return cloneObj
+    const clone = Array.isArray(obj)?[]:{}
+    visited.
 }
 // 14、翻转二叉树
 function reverseTree(root){
@@ -544,22 +538,83 @@ function retry(func,count){
 }
 // 30、Promise的递归调用
 function DiguiPromise(arr){
+    if(arr.length===0){
+        return new Promise.resolve()
+    }
+    const curPro = arr[0]
+    return curPro
+    .then(res=>{
+        arr.pop()
+        console.log(res)
+        DiguiPromise(arr)
+    })
+    .catch(error=>{
+        arr.pop()
+        console.log(error)
+        DiguiPromise(arr)
+    })
 
 }
 // 31、对象扁平化
 function flattenObject(obj) {
-
+    const result = {}
+    function recurse(curObj,curKey){
+        for(let key in curObj){
+            if(curObj.hasOwnProperty(key)){
+                const newKey = curKey?`${curKey}.${key}`:key
+                if(typeof curObj[key]==='object'&&curObj[key]!==null){
+                    recurse(curObj[key],newKey)
+                }else{
+                    result[newKey] = curObj[key]
+                }
+            }
+        }
+    }
+    recurse(obj,'')
+    return result
 }
 
 
 
 // 5、vue3响应式
 function reactive(obj) {
-
+    const handlers={
+        get(target,key,receiver){
+            TrackEvent(target,key)
+            return Reflect.get(target,key,receiver)
+        },
+        set(target,key,value,receiver){
+            const oldVal = target[key]
+            const result = Reflect.set(target,key,value,receiver)
+            if(oldVal !==value){
+                trigger(target,key)
+            }
+            return result
+        },
+        deleteProperty(target,key){
+            const result = Reflect.deleteProperty(target,key)
+            trigger(target,key)
+            return result
+        }
+    }
+    return new Proxy(obj,handlers)
 }
 // 7、全排列
 function permute(nums) {
-
+    const result = []
+    function backtrack(start){
+        if(start === nums.length){
+            result.push([...nums])
+            return
+        }
+        for(let i = start;i<nums.length;i++){
+            [nums[start],nums[i]] = [nums[i],nums[start]]
+            backtrack(start+1)
+            [nums[start],nums[i]] = [nums[i],nums[start]]
+        }
+    }
+    backtrack(0)
+    return result
 }
 console.log(permute(1,2,3))
 // 8、对角线遍历数组
@@ -569,7 +624,19 @@ function diagonalTraverse(matrix) {
 
 // 9、数组转树
 function arrayToTree(arr) {
-
+    const map = {}
+    const roots = []
+    arr.forEach((item)=>{
+        map[item.id]={...item,children:[]}
+    })
+    Object.values(map).forEach((node)=>{
+        if(node.parentId !== null){
+            map[node.parentId].children.push(node)
+        }else{
+            roots.push(node)
+        }
+    })
+    return roots
 }
 const arr = [
   { id: 1, parentId: null, name: 'Node 1' },
@@ -584,25 +651,95 @@ const arr = [
 //   console.log(arrayToTree(arr))
 // 10、三数之和
 function threeSum(nums) {
- 
+    nums.sort((a,b)=>a-b)
+    const result = []
+    for(let i = 0;i<nums.length-2;i++){
+        if(nums[i]>0){
+            break
+        }
+        if(i > 0&& nums[i]===nums[i-1]){
+            continue
+        }
+        let left = i+1
+        let right = nums.length-1
+        while(left<right){
+            const sum = nums[i] + nums[left]+nums[right]
+            if(sum===0){
+                result.push([nums[i],nums[left],nums[right]])
+                while(left<right&&nums[left]===nums[left+1]){
+                    left++
+                }
+                while(left<right&&nums[right]===nums[right-1]){
+                    right--
+                }
+                left++
+                right--
+            }else if(sum<0){
+                left++
+            }else{
+                right--
+            }
+        }
+    }
+    return result
 }
 
 
 // 12、归并
 
 function mergeSort(arr) {
-  
+    if(arr.length<=1){
+        return arr
+    }
+    let mid = Math.floor(arr.length/2)
+    let left = arr.slice(0,mid)
+    let right = arr.slice(mid)
+    return merge(mergeSort(left),mergeSort(right))
 }
 
 function merge(left, right) {
-
-}
+    const result = []
+    let leftIndex = 0
+    let rightIndex = 0
+    while(leftIndex<left.length&&rightIndex<right.length){
+        if(left[leftIndex]<right[rightIndex]){
+            result.push(left[leftIndex])
+            leftIndex++
+        }else{
+            result.push(right[rightIndex])
+            rightIndex--
+        }
+    }
+    return result.concat(left.slice(leftIndex).concat(right.slice(rightIndex)))
+}   
 // 限制并发2
 function limitConcurrency(requests, limit) {
 
 }
 // 限制并发
 function limitConcurrency(urls, maxConcurrency) {
-
+    let runningCount = 0
+    let index = 0
+    function runNext(){
+        if(runningCount>=maxConcurrency||index>=urls.length){
+            return
+        }
+        const url = urls[index]
+        index++
+        runningCount+
+        fetch(url)
+        .then(res=>{
+            console.log(res)
+        })
+        .catch(error=>{
+            console.log(error)
+        })
+        .finally(()=>{
+            runningCount--
+            runNext()
+        })
+        runNext()
+    }
+    runNext()
 }
 
