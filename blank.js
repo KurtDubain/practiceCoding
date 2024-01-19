@@ -256,29 +256,82 @@ function Deepclone(obj,visited = new Map()){
 }
 // 14、翻转二叉树
 function reverseTree(root){
-    
+    if(!root){
+        return
+    }
+    let left = reverseTree(root.left)
+    let right = reverseTree(root.right)
+
+    root.left = right
+    root.reactive = left
+    return root
 }
 // 15、零钱兑换
 function findMoney(account,coins){
-
+    const dp = new Array(account+1).fill(Infinity)
+    dp[0] = 0
+    for(let i = 0;i<account;i++){
+        for(let coin of coins){
+            if(i>=coin){
+                dp[i]=Math.min(dp[i],dp[i-coin]+1)
+            }
+        }
+    }
+    return dp[account]
 }
 // 16、-_转驼峰命名
 function changeToCamel(str){
-
+    const result = []
+    const strArr = str.split(/-_/)
+    if(strArr.length===1){
+        return strArr.join('')
+    }else if(strArr.length>1){
+        result.push(strArr[0])
+        for(let i = 1;i<strArr.length;i++){
+            const curStr = strArr[i]
+            result.push(curStr.chatAt(0).toUpperCase()+curStr.slice(1))
+        }
+    }
+    return result.join('')
 }
 // 17、快排
 function quickSort(arr){
-  
+    if(arr.length<=1){
+        return arr
+    }
+    const right = []
+    const left = []
+    const mid = []
+    let p = Math.floor(arr.length/2)
+    for(let i = 0;i<arr.length;i++){
+        if(arr[i]>arr[p]){
+            right.push(arr[i])
+        }else if(arr[i]<arr[p]){
+            left.push(arr[i])
+        }else{
+            mid.push(arr[i])
+        }
+    }
+    return [...quickSort(left),...mid,...quickSort(right)]
 }
 // 18、求每个元素在数组中比他小的其他元素的个数
 function findSmaller(arr){
-
+    const newArr = arr.sort((a,b)=>a-b)
+    const result = []
+    for(let i = 0;i<arr.length;i++){
+        result.push([arr[i],newArr.indexOf(arr[i])])
+    }
+    return result
 }
 // 19、手写new和寄生组合式继承
 
 function myNew(constructor,...args){
-
+    const newObj = Object.create(constructor.prototype)
+    const result = constructor.apply(newObj,args)
+    return result instanceof Object?result:newObj
 }
+
+
 
 // function Person(name){
 //   this.name = name
@@ -299,21 +352,69 @@ function myNew(constructor,...args){
 // }
 // 20、回文链表
 function isBackList(head){
-
+    if(!head&&!head.next){
+        return true
+    }
+    let slow = head
+    let fast = head
+    while(fast.next&&fast.next.next){
+        slow = slow.next
+        fast = fast.next.next
+    }
+    let part = reverseNodeList(slow)
+    let p1 = head
+    let p2 = part
+    while(p1.next){
+        if(p1.val !== p2.val){
+            return false
+        }
+    }
+    return true
 }
 function reverseNodeList(head){
-
+    let pre = null
+    let cur = head
+    while(cur){
+        let next = cur.next
+        cur.next = pre
+        pre = cur
+        cur = next
+    }
+    return pre
 }
+
 // 21、递归实现Pow方法
 function NewPow(x,n){
-
+    if(n===0){
+        return 1
+    }else{
+        return x*NewPow(x,n-1)
+    }
 }
 // 22、跳台阶
 function jumpFloor1(n){
-
+    if(n==1){
+        return 1
+    }else if(n==2){
+        return 2
+    }else{
+        return jumpFloor1(n-1)+jumpFloor1(n-2)
+    }
 }
 function jumpFloor2(n){
-
+    if(n==1){
+        return 1
+    }else if(n==2){
+        return 2
+    }else{
+        const dp = new Array(n+1)
+        dp[1] = 1
+        dp[2] = 2
+        for(let i =3;i<dp;i++){
+            dp[i] = dp[i-1]+dp[i-2]
+        }
+        return dp[n]
+    }
 }
 // 23、打家劫舍
 function rob1(arr){
@@ -321,23 +422,125 @@ function rob1(arr){
 }
 // 24、最长无重复子串
 function findLongStr(str){
-
+    let start = 0
+    let end = 0
+    let maxSum = 0
+    let maxStart = 0
+    const set = new Set()
+    while(start<str.length&&end<str.length){
+        if(!set.has(str[end])){
+            set.add(str[end],end)
+            maxStart = start
+            maxSum = Math.max(maxSum,end-start+1)
+            end++
+        }else{
+            set.delete(str[start])
+            start++
+        }
+    }
+    return str.substr(maxStart,maxSum)
 }
 // 25、千分位转换
 function changeK(str){
-
+    const result = []
+    const [intStr,decStr] = str.split('.')
+    let count = 2
+    for(let i = intStr.length-1;i>=0;i--){
+        result.unshift(intStr[i])
+        if(count===0||i!==0){
+            result.unshift(',')
+            count = 2
+        }else{
+            count --
+        }
+    }
+    return decStr?result.join('')+'.'+decStr:result.join('')
 }
 // 26、括号闭合问题
 function isClosed(str){
-
+    const left = ['(','[','{']
+    const right = [')',']','}']
+    const stack = []
+    for(let i = 0;i<str.length;i++){
+        if(left.includes(str[i])){
+            stack.push(str[i])
+        }else{
+            const curStr = stack.pop()
+            if(right[left.indexOf(curStr)]!==str[i]){
+                return false
+            }
+        }
+    }
+    return true
 }
 // 27、EventBus
-
+class EventBus{
+    constructor() {
+        this.events = {}
+    }
+    on(name,func){
+        if(!this.events[name]){
+            this.events[name]=[]
+        }
+        this.events[name].push(func)
+    }
+    emit(name,...args){
+        if(this.events[name]){
+            this.events[name].forEach(func=>{
+                func(...args)
+            })
+        }
+    }
+    off(name){
+        if(this.events[name]){
+            delete this.events[name]
+        }
+    }
+}
 // 28、Observer
-
+class Observer{
+    constructor(){
+        this.subers = []
+    }
+    sub(name){
+        this.subers.push(name)
+    }
+    unSub(name){
+        this.subers = this.subers.filter((item)=>item!==name)
+    }
+    notify(data){
+        this.subers.forEach(suber=>{
+            suber.update(data)
+        })
+    }
+}
+class Suber{
+    constructor(name){
+        this.name = name
+    }
+    update(data){
+        console.log(`i am ${this.name},update ${data}`)
+    }
+}
 // 29、Promise的retry
 function retry(func,count){
-
+    return new Promise((resolve,reject)=>{
+        let tryTime = 0
+        function tryIt(){
+            func()
+            .then(res=>{
+                resolve(res)
+            })
+            .catch(error=>{
+                tryTime++
+                if(count<tryTime){
+                    reject(error)
+                }
+                tryIt()
+            })
+        }
+        tryIt()
+    })
 }
 // 30、Promise的递归调用
 function DiguiPromise(arr){
