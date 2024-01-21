@@ -576,7 +576,7 @@ function flattenObject(obj) {
 
   
 
-// 5、vue3响应式
+// 32、vue3响应式
 function reactive(obj) {
     const handlers = {
       get(target, key, receiver) {
@@ -600,7 +600,7 @@ function reactive(obj) {
   
     return new Proxy(obj, handlers);
   }
-// 7、全排列
+// 33、全排列
 function permute(nums) {
     const result = [];
     
@@ -621,7 +621,7 @@ function permute(nums) {
     return result;
   }
   console.log(permute(1,2,3))
-// 8、对角线遍历数组
+// 34、对角线遍历数组
 function diagonalTraverse(matrix) {
     if (matrix.length === 0 || matrix[0].length === 0) {
       return [];
@@ -663,7 +663,7 @@ function diagonalTraverse(matrix) {
     return result;
   }
  
-// 9、数组转树
+// 35、数组转树
 function arrayToTree(arr) {
     const map = {};
     const roots = [];
@@ -696,7 +696,7 @@ function arrayToTree(arr) {
     { id: 8, parentId: 5, name: 'Node 8' },
   ]
 //   console.log(arrayToTree(arr))
-// 10、三数之和
+// 36、三数之和
 function threeSum(nums) {
     nums.sort((a, b) => a - b);  // 将数组进行排序
     const result = [];
@@ -736,7 +736,7 @@ function threeSum(nums) {
   }
 
 
-// 12、归并
+// 37、归并
 
 function mergeSort(arr) {
     if (arr.length <= 1) {
@@ -764,45 +764,7 @@ function mergeSort(arr) {
     return result.concat(left.slice(leftIndex)).concat(right.slice(rightIndex));
   }
   
-function limitConcurrency(requests, limit) {
-    const results = [];  // 存储请求结果的数组
-    let running = 0;  // 当前正在执行的请求数量
-    let index = 0;  // 当前请求的索引
-  
-    async function runNext() {
-      if (index >= requests.length) {
-        return;  // 所有请求已经执行完毕
-      }
-  
-      const current = index++;  // 当前请求的索引自增
-      running++;  // 增加正在执行的请求数量
-  
-      try {
-        const result = await requests[current]();  // 执行当前请求
-        results[current] = result;  // 存储请求结果
-      } catch (error) {
-        results[current] = error;  // 存储请求错误信息
-      }
-  
-      running--;  // 当前请求执行完毕，减少正在执行的请求数量
-      runNext();  // 执行下一个请求
-    }
-  
-    // 启动初始的请求
-    while (running < limit && index < requests.length) {
-      runNext();
-    }
-  
-    // 返回一个 Promise，在所有请求执行完毕后进行 resolve
-    return new Promise((resolve) => {
-      const checkInterval = setInterval(() => {
-        if (index >= requests.length && running === 0) {
-          clearInterval(checkInterval);
-          resolve(results);
-        }
-      }, 10);
-    });
-}
+// PromiseAll并且限制并发
 
 function limitConcurrency(arr, limit) {
     return new Promise((resolve,reject) => {
@@ -828,7 +790,5 @@ function limitConcurrency(arr, limit) {
             step(i)
         }
     })
-
-
 }
 
