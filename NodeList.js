@@ -84,8 +84,6 @@ function deleteRepeatNode2(head){
         }
     }
     return dummy.next
-
-
 }
 
 
