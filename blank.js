@@ -152,7 +152,16 @@ function Deepclone(obj,visited = new Map()){
 
 // 15、零钱兑换
 function findMoney(account,coins){
-
+  const dp = new Array(account+1).fill(Infinity)
+  dp[0] = 0
+  for(let i = 0;i<account+1;i++){
+    for(let coin of coins){
+      if(coin<=i){
+        dp[i] = Math.min(dp[i],dp[i-coin]+1)
+      }
+    }
+  }
+  return dp[account]
 }
 
 
@@ -160,7 +169,9 @@ function findMoney(account,coins){
 // 19、手写new和寄生组合式继承
 
 function myNew(constructor,...args){
-
+  const newObj = Object.create(constructor.prototype)
+  const result = constructor.apply(newObj,...args)
+  return result instanceof Object?result:newObj
 }
 
 function Person(name){
@@ -182,33 +193,141 @@ Child.prototype.haha = function(){
 }
 // 20、回文链表
 function isBackList(head){
-
+  if(!head||!head.next){
+    return true
+  }
+  let slow = head
+  let fast = head
+  while(fast.next&&fast.next.next){
+    fast = fast.next.next
+    slow = slow.next
+  }
+  let newNode = reverseNodeList(slow.next)
+  let p1 = head
+  let p2 = newNode
+  while(p1.next){
+    if(p1.val !== p2.val){
+      return false
+    }
+    p1 = p1.next
+    p2 = p2.next
+  }
+  return true
 }
 function reverseNodeList(head){
-
+  let cur = head
+  let pre = null
+  while(cur){
+    let next = cur.next
+    cur.next = pre
+    pre = cur
+    cur = next
+  }
+  return pre
 }
 
 
 
 // 24、最长无重复子串
 function findLongStr(str){
-
+  let start = 0
+  let end = 0
+  let maxStart = 0
+  let maxSum = 0
+  const set = new Set()
+  while(start<str.length&&end<str.length){
+    if(!set.has(str[end])){
+      if(maxSum<(end-start+1)){
+        maxSum = end-start+1
+        maxStart = start
+      }
+      set.add(str[end],str[end])
+      end++
+    }else{
+      set.delete(str[start])
+      start++
+    }
+  }
+  return maxSum
 }
 // 25、千分位转换
 function changeK(str){
-
+  let count = 2
+  const [intArr,decArr] = str.split('.')
+  const result = []
+  for(let i = intArr.length-1;i>0;i--){
+    result.unshift(intArr[i])
+    if(count==0&&i!=0){
+      result.unshift(',')
+      count=2
+    }else{
+      count--
+    }
+  }
+  return decArr?`${result.join('')}.${decArr}`:result.join('')
 }
-// 26、括号闭合问题
-function isClosed(str){
 
-}
 // 27、EventBus
-
+class EventBus{
+  constructor(){
+    this.events = {}
+  }
+  on(name,func){
+    if(!this.events[name]){
+      this.events[name] = []
+    }
+    this.events[name].push(func)
+  }
+  off(name){
+    if(this.events[name]){
+      delete this.events[name]
+    }
+  }
+  emit(name,...args){
+    if(this.events[name]){
+      this.events[name].forEach((func)=>{
+        func(...args)
+      })
+    }
+  }
+}
 // 28、Observer
-
+class Observer{
+  constructor(){
+    this.subers = []
+  }
+  sub(name){
+    this.subers.push(name)
+  }
+  unSub(name){
+    this.subers = this.subers.filter(item => item!=name)
+  }
+  notify(data){
+    this.subers.forEach((suber)=>{
+      suber.update(data)
+    })
+  }
+}
 // 29、Promise的retry
 function retry(func,count){
-
+  return new Promise((resolve,reject)=>{
+    let times = 0
+    function tryIt(){
+      func
+        .then(res=>{
+          resolve(res)
+        })
+        .catch(error=>{
+          if(times==count){
+            reject(error)
+          }else{
+            times++
+            tryIt()
+          }
+        })
+    }
+    tryIt()
+  })
 }
 // 30、Promise的递归调用
 function DiguiPromise(arr){
@@ -248,11 +367,30 @@ function arrayToTree(arr) {
 // 37、归并
 
 function mergeSort(arr) {
-  }
+  if(arr.length<1){
+    return arr
+  }  
+  let mid = Math.floor(arr.length/2)
+  let right = arr.slice(0,mid)
+  let left = arr.slice(mid)
+  return merge(mergeSort(left),mergeSort(right))
+}
   
-  function merge(left, right) {
-
+function merge(left, right) {
+  let leftIndex = 0
+  let rightIndex = 0
+  let result = []
+  while(leftIndex<left.length&&rightIndex<right.length){
+    if(left[leftIndex]>=right[rightIndex]){
+      result.push(left[leftIndex])
+      leftIndex++
+    }else{
+      result.push(right[rightIndex])
+      rightIndex++
+    }
   }
+  return result.concat(left.slice(leftIndex).concat(right.slice(rightIndex)))
+}
   
 // PromiseAll并且限制并发
 
