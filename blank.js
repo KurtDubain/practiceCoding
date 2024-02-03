@@ -336,20 +336,46 @@ function DiguiPromise(arr){
 // 31、对象扁平化
 function flattenObject(obj) {
 
-  }
+}
 
   
 
 // 33、全排列
 function permute(nums) {
-
+  let result = []
+  function backtrack(start){
+    if(start === nums.length){
+      result.push(nums)
+      return
+    }
+    for(let i = start;i<nums;i++){
+      [nums[i],nums[start]] = [nums[start],nums[i]]
+      backtrack(start+1)
+      [nums[i],nums[start]] = [nums[start],nums[i]]
+    }
   }
+  backtrack(0)
+  return result
+}
   console.log(permute(1,2,3))
 
 // 35、数组转树
 function arrayToTree(arr) {
+  const root = []
+  const map = {}
 
-  }
+  arr.forEach(item=>{
+    map[item.id]={...item,children:[]}
+  })
+  Object.values(map).map(node=>{
+    if(node.parentId===null){
+      root.push(node)
+    }else{
+      map[node.parentId].children.push(map[node])
+    }
+  })
+  return root
+}
   const arr = [
     { id: 1, parentId: null, name: 'Node 1' },
     { id: 2, parentId: 1, name: 'Node 2' },
