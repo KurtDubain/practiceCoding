@@ -1,35 +1,162 @@
 // 1、大数相加
-function bigNumAdd(str1, str2) {}
+function bigNumAdd(str1, str2) {
+  let i = 0;
+  let j = 0;
+  let sum = 0;
+  let carry = 0;
+  while (i < str1.length && j < str2.length && carry > 0) {
+    let num1 = i < str1.length ? parseInt(str1[i]) : 0;
+    let num2 = j < str2.length ? parseInt(str2[j]) : 0;
+    let temp = num1 + num2 + carry;
+    sum = Math.floor(temp % 10);
+    carry = Math.floor(temp / 10);
+  }
+  return sum;
+}
 
 // 2、instanceof手写
-function NewInstanceof(obj, constructor) {}
+function NewInstanceof(obj, constructor) {
+  if (typeof obj !== "object" || obj == null) {
+    return false;
+  }
+  let prototype = Object.getPrototypeOf(obj);
+  while (prototype != null) {
+    if (prototype == constructor.prototype) {
+      return true;
+    }
+    prototype = Object.getPrototypeOf(prototype);
+  }
+  return false;
+}
 // 3、节流、防抖
-function throttle(func, delay) {}
-function debounce(func, delay) {}
+function throttle(func, delay) {
+  let timer = null;
+  return function (...args) {
+    if (!timer) {
+      timer = setTimeout(() => {
+        func.apply(this, ...args);
+        timer = null;
+      }, delay);
+    }
+  };
+}
+function debounce(func, delay) {
+  let timer;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(this, ...args);
+      clearTimeout(timer);
+    }, delay);
+  };
+}
 
 // 5、16进制转10进制
-function Ch16To10(str) {}
+function Ch16To10(str) {
+  const newStr = "0123456789ABCDEF";
+  let result = 0;
+  for (let i = 0; i < str.length; i++) {
+    const curChar = str[i];
+    const curNum = parseInt(newStr.indexOf(curChar.toUpperCase()));
+    result = result * 10 + curNum;
+  }
+  return result;
+}
 
 // 8、函数柯里化func(1)(2)(3)
-function curry(func) {}
+function curry(func) {
+  return function curried(...args) {
+    if (args.length > func.length) {
+      return func.apply(this, ...args);
+    } else {
+      return function (...newArgs) {
+        return curried.apply(this, args.concat(...newArgs));
+      };
+    }
+  };
+}
 // 9、手写Promise以及then以及All
-function promiseAll(arr) {}
+function promiseAll(arr) {
+  return new Promise((resolve, reject) => {
+    let count = 0;
+    const results = [];
+    for (let i = 0; i < arr.length; i++) {
+      const promise = arr[i];
+      promise
+        .then((result) => {
+          results[i] = result;
+          count++;
+          if (count == arr.length) {
+            resolve(results);
+          }
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    }
+  });
+}
 
 // 11、实现LRU
 class LRUCache {}
 // 12、call、bind、apply方法手写
-function myCall(context, arg) {}
-function myApply(context, ...args) {}
-function myBind(context, ...args) {}
+function myCall(context, arg) {
+  context = context || window;
+  const fn = Symbol("fn");
+  const result = context[fn](arg);
+  delete context[fn];
+  return result;
+}
+function myApply(context, ...args) {
+  context = context || window;
+  const fn = Symbol("fn");
+  const result = context[fn](...args);
+  delete context[fn];
+  return result;
+}
+function myBind(context, ...args) {
+  let fn = context;
+  return fn.apply(this, ...args);
+}
 // 13、深拷贝（解决循环应用）
-function Deepclone(obj, visited = new Map()) {}
+function Deepclone(obj, visited = new Map()) {
+  if (obj == null || typeof obj !== "object") {
+    return obj;
+  }
+  if (visited.has(obj)) {
+    return visited.get(obj);
+  }
+  const clone = Array.isArray(obj) ? [] : {};
+  visited.set(obj, clone);
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      clone[key] = Deepclone(obj[key], visited);
+    }
+  }
+  return clone;
+}
 
 // 15、零钱兑换
-function findMoney(account, coins) {}
+function findMoney(account, coins) {
+  const dp = new Array(account + 1).fill(Infinity);
+  dp[0] = 0;
+  for (let i = 0; i < account; i++) {
+    for (let coin of coins) {
+      if (coin <= i) {
+        dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+      }
+    }
+  }
+  return dp[account];
+}
 
 // 19、手写new和寄生组合式继承
 
-function myNew(constructor, ...args) {}
+function myNew(constructor, ...args) {
+  const newObj = Object.create(constructor.prototype);
+  const result = constructor.apply(newObj, ...args);
+  return result instanceof Object ? result : newObj;
+}
 
 function Person(name) {
   this.name = name;
@@ -49,11 +176,65 @@ Child.prototype.haha = function () {
   console.log(`i am ${this.name},i am ${this.sex}`);
 };
 // 20、回文链表
-function isBackList(head) {}
-function reverseNodeList(head) {}
+function isBackList(head) {
+  if (!head || !head.next) {
+    return true;
+  }
+  let fast = head.next;
+  let slow = head.next;
+  while (fast.next.next && fast.next) {
+    fast = fast.next.next;
+    slow = slow.next;
+  }
+  let newHead = reverseNodeList(slow.next);
+  let p1 = head;
+  let p2 = newHead;
+  while (p1) {
+    if (p1.val != p2.val) {
+      return false;
+    }
+    p1 = p1.next;
+    p2 = p2.next;
+  }
+  return true;
+}
+function reverseNodeList(head) {
+  if (!head.next) {
+    return head;
+  }
+  let cur = head;
+  let pre = null;
+  while (cur) {
+    let next = cur.next;
+    cur.next = pre;
+    pre = cur;
+    cur = next;
+  }
+  return pre;
+}
 
 // 24、最长无重复子串
-function findLongStr(str) {}
+function findLongStr(str) {
+  let left = 0;
+  let right = 0;
+  let maxLength = 0;
+  let maxStart = 0;
+  const set = new Set();
+  while (left < str.length && right < str.length) {
+    if (!set.has(str[right])) {
+      if (maxLength < right - left + 1) {
+        maxLength = right - left + 1;
+        maxStart = left;
+      }
+      right++;
+      set.add(str[right]);
+    } else {
+      set.delete(str[left]);
+      left++;
+    }
+  }
+  return maxLength;
+}
 // 25、千分位转换
 function changeK(str) {}
 
