@@ -236,12 +236,69 @@ function findLongStr(str) {
   return maxLength;
 }
 // 25、千分位转换
-function changeK(str) {}
+function changeK(str) {
+  const [int, dec] = str.split(".");
+  const result = [];
+  let count = 2;
+  for (let i = int.length - 1; i > 0; i--) {
+    if (count == 0 && i !== 0) {
+      result.unshift(int[i]);
+      result.unshift(",");
+    } else {
+      count--;
+      result.unshift(int[i]);
+    }
+  }
+  return dec ? `${result.join("")}.${dec}` : result.join("");
+}
 
 // 27、EventBus
-class EventBus {}
+class EventBus {
+  constructor() {
+    this.events = {};
+  }
+  on(name, func) {
+    if (!this.events[name]) {
+      this.events[name] = [];
+    }
+    this.events[name].push(func);
+  }
+  emit(name, ...args) {
+    this.events[name].forEach((func) => {
+      func(...args);
+    });
+  }
+  delete(name) {
+    if (this.events[name]) {
+      delete this.events[name];
+    }
+  }
+}
 // 28、Observer
-class Observer {}
+class Observer {
+  constructor() {
+    this.subers = [];
+  }
+  sub(name) {
+    this.subers.push(name);
+  }
+  unSub(name) {
+    this.subers = this.subers.filter((item) => item != name);
+  }
+  emit(data) {
+    this.subers.forEach((name) => {
+      name.haha(data);
+    });
+  }
+}
+class Suber {
+  constructor(name) {
+    this.name = name;
+  }
+  haha(data) {
+    console.log(this.name, data);
+  }
+}
 // 29、Promise的retry
 function retry(func, count) {}
 // 30、Promise的递归调用
@@ -254,7 +311,11 @@ function permute(nums) {}
 console.log(permute(1, 2, 3));
 
 // 35、数组转树
-function arrayToTree(arr) {}
+function arrayToTree(arr) {
+  let root = []
+  let newRes = []
+  newRes = arr.map(item=>{...item,children:[]})
+}
 const arr = [
   { id: 1, parentId: null, name: "Node 1" },
   { id: 2, parentId: 1, name: "Node 2" },
