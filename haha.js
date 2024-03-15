@@ -1,16 +1,13 @@
-var num = 1;
-var obj = {
-  num: 4,
-  dbl: (function () {
-    this.num *= 2;
-    return function () {
-      this.num *= 2;
-    };
-  })(),
-};
-var obj1 = obj.dbl;
-obj1();
-// obj.dbl();
-// console.log(obj1());
-// console.log(obj.dbl()());
-console.log(num);
+const promise = new Promise((resolve, reject) => {
+  console.log(1);
+  setTimeout(() => {
+    console.log("timeStart");
+    resolve("success");
+    console.log("timeEnd");
+  }, 0);
+  console.log(2);
+});
+promise.then((res) => {
+  console.log(res);
+});
+console.log(4);
