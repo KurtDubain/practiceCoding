@@ -1,22 +1,16 @@
-function sum(n) {
-  let currentSum = n || 0;
-  function f(next) {
-    if (next === undefined) return currentSum;
-    currentSum += next;
-    return f;
-  }
-  // f.toString = function () {
-  //   return currentSum;
-  // };
-  if (n == undefined) {
-    return 0;
-  } else {
-    return f;
-  }
-}
-
-console.log(sum()); // 0
-console.log(sum(1)()); // 1
-console.log(sum(1)(2)(2)()); // 5
-const hh = sum(1)(3);
-console.log(hh()); // 4
+var num = 1;
+var obj = {
+  num: 4,
+  dbl: (function () {
+    this.num *= 2;
+    return function () {
+      this.num *= 2;
+    };
+  })(),
+};
+var obj1 = obj.dbl;
+obj1();
+// obj.dbl();
+// console.log(obj1());
+// console.log(obj.dbl()());
+console.log(num);
