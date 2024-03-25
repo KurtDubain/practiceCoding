@@ -1,5 +1,2 @@
-const a = function b() {
-  console.log("hh");
-};
-a();
-// b();
+console.log(1 && 2);
+ab;
