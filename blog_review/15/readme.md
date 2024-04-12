@@ -66,12 +66,12 @@
 
 ```
 // 空格
-    const isWhitespace = (char) => /\s/.test(char);
-    // 字母
-    const isLetter = (char) => /[a-zA-Z]/.test(char);
-    // 数字
-    const isDigit = (char) => /\d/.test(char);
-    //...等等处理其他类型的char
+const isWhitespace = (char) => /\s/.test(char);
+// 字母
+const isLetter = (char) => /[a-zA-Z]/.test(char);
+// 数字
+const isDigit = (char) => /\d/.test(char);
+//...等等处理其他类型的char
 ```
 
 这里需要注意，对于一些双符号操作符或者变量，可能需要利用nextChar来进行处理或者利用多次循环的拼接来处理，
@@ -79,14 +79,51 @@
 
 ```
 // EOF表示终止符
-    tokens.push({ type: "EOF", value: null, line: currentLine });
+tokens.push({ type: "EOF", value: null, line: currentLine });
 ```
 
 至此，最终能够获取最后的tokens，用于后续的语法分析，格式如下(示例)：
 
-<div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/14_1.jpeg " style="max-width:90%; height: auto;" >
-</div>
+```
+"LexicalAnalysis": [
+            {
+                "type": "Keyword",
+                "value": "var",
+                "line": 1
+            },
+            {
+                "type": "Identifier",
+                "value": "x",
+                "line": 1
+            },
+            {
+                "type": "Semicolon",
+                "value": ";",
+                "line": 1
+            },
+            {
+                "type": "Keyword",
+                "value": "begin",
+                "line": 2
+            },
+            {
+                "type": "Identifier",
+                "value": "x",
+                "line": 3
+            },
+            ...,
+            {
+                "type": "End",
+                "value": ".",
+                "line": 22
+            },
+            {
+                "type": "EOF",
+                "value": null,
+                "line": 22
+            }
+        ]
+```
 
 </div>
 
@@ -106,27 +143,27 @@
 - match：核心方法，用于匹配当前token是否和期望类型或者值匹配，匹配则前进一个curIndex，否则抛出异常；
 
 ```
-    // 匹配
-  match(expectedType, expectedValue = null) {
-    if (this.currentToken && this.currentToken.type === expectedType) {
-      // 如果提供了expectedValue，则还需要匹配token的具体值
-      if (expectedValue !== null && this.currentToken.value !== expectedValue) {
-        throw new Error(
-          `Expected token value ${expectedValue}, but found ${this.currentToken.value}`
-        );
-      }
-      this.advance();
-    } else {
-      // 抛出错误时，包含更多关于期望和实际的信息
-      const foundType = this.currentToken ? this.currentToken.type : "EOF";
-      const foundValue = this.currentToken ? this.currentToken.value : "None";
+  // 匹配
+match(expectedType, expectedValue = null) {
+  if (this.currentToken && this.currentToken.type === expectedType) {
+    // 如果提供了expectedValue，则还需要匹配token的具体值
+    if (expectedValue !== null && this.currentToken.value !== expectedValue) {
       throw new Error(
-        `Expected token type ${expectedType}${
-          expectedValue ? " with value " + expectedValue : ""
-        }, but found type ${foundType} with value ${foundValue}`
+        `Expected token value ${expectedValue}, but found ${this.currentToken.value}`
       );
     }
-  },    
+    this.advance();
+  } else {
+    // 抛出错误时，包含更多关于期望和实际的信息
+    const foundType = this.currentToken ? this.currentToken.type : "EOF";
+    const foundValue = this.currentToken ? this.currentToken.value : "None";
+    throw new Error(
+      `Expected token type ${expectedType}${
+        expectedValue ? " with value " + expectedValue : ""
+      }, but found type ${foundType} with value ${foundValue}`
+    );
+  }
+},    
 ```
 
 - peek：预测下一个token的值，通常用于避免回溯，进行优化；
@@ -357,13 +394,68 @@ forStatement() {
 
 通过上述的几个核心方法，语法分析器会在调用analyze(tokens)的时候，执行一系列方法，依次读取tokens，并构建AST，JSON格式如下：
 
+```
+"SyntaxAnalysis": {
+            "type": "Program",
+            "children": [
+                {
+                    "type": "Block",
+                    "children": [
+                        {
+                            "type": "Declaration",
+                            "children": [
+                                {
+                                    "type": "VarDeclaration",
+                                    "name": "x",
+                                    "line": 1
+                                },
+                                {
+                                    "type": "VarDeclaration",
+                                    "name": "y",
+                                    "line": 1
+                                }
+                            ],
+                            "line": 3
+                        },
+                        {
+                            "type": "BeginEndBlock",
+                            "statements": [
+                                {
+                                    "type": "ReadStatement",
+                                    "variableName": "x",
+                                    "line": 4
+                                },
+                                {
+                                    "type": "ReadStatement",
+                                    "variableName": "y",
+                                    "line": 5
+                                },
+                                {
+                                    "type": "WriteStatement",
+                                    "expression": {
+                                        "type": "Identifier",
+                                        "name": "x",
+                                        "line": 6
+                                    },
+                                    "line": 6
+                                }
+                            ],
+                            "line": 4
+                        }
+                    ],
+                    "line": 7
+                }
+            ],
+            "line": 7
+        }
+```
+
 经过加工后的前端显示格式如下：
-
-在构建AST完成之后，会利用AST进行语义分析和中间代码生成处理。
-
 <div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/14_1.jpeg " style="max-width:90%; height: auto;" >
+<!-- <img src="https://www.dyp02.vip/assets/imageForOwners/14_1.jpeg " style="max-width:90%; height: auto;" > -->
+<img src="../15/assets/yufaResult.png" style="max-width:90%; height: auto;" >
 </div>
+在构建AST完成之后，会利用AST进行语义分析和中间代码生成处理。
 
 </div>
 
@@ -432,11 +524,20 @@ forStatement() {
 
 总体来说，语义分析主要是对于SymbolTable的构建，利用SymbolTable检查代码是否存在语义上的歧义，同时生成的符号表也可以为后续调试等功能提供相应数据，其大概格式为：
 
-后续可能会利用符号表提取常量和变量的数据，做一些二次处理，这些会在后面的调试器内容中提到；
+```
+"SemanticAnalysis": {
+            "x": {
+                "type": "VarDeclaration",
+                "value": null
+            },
+            "y": {
+                "type": "VarDeclaration",
+                "value": null
+            }
+        }
+```
 
-<div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/14_1.jpeg " style="max-width:90%; height: auto;" >
-</div>
+后续可能会利用符号表提取常量和变量的数据，做一些二次处理，这些会在后面的调试器内容中提到；
 
 </div>
 
@@ -555,13 +656,16 @@ switch (node.type) {
     }
 ```
 
-中间代码生成器在根据AST生成中间代码的过程的同时，也会同时携带对应的line，便于在目标代码生成的时候携带line，用于pl0代码和目标代码的映射处理；上述代码段只显示了部分语句的处理，由于篇幅限制，并没有提供完整代码，中间代码的格式在前端的显示效果如下（示例）：
+中间代码生成器在根据AST生成中间代码的过程的同时，也会同时携带对应的line，便于在目标代码生成的时候携带line，用于pl0代码和目标代码的映射处理；上述代码段只显示了部分语句的处理，由于篇幅限制，并没有提供完整代码，中间代码的格式在前端的显示效果如下（for循环示例）：
+
+<!-- <div style="text-align:center">
+<img src="https://www.dyp02.vip/assets/imageForOwners/14_1.jpeg " style="max-width:90%; height: auto;" >
+</div> -->
+<div style="text-align:center">
+<img src="./assets/zhongjianResult.png" style="max-width:90%; height: auto;" >
+</div>
 
 生成中间代码之后，可以进行最后的目标代码生成处理。
-
-<div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/14_1.jpeg " style="max-width:90%; height: auto;" >
-</div>
 
 </div>
 
@@ -646,13 +750,14 @@ switch (node.type) {
 ```
 
 对于目标代码的生成，我还在每一行进行了注释添加，注释后面添加的内容是当前js行对应的pl0源代码的行数，实现一种简单的映射，便于前端用户的查看，同时也方面后续调试功能的映射处理。目标代码在前端的展示效果如下，对于同一段代码的解析，JS格式如下：
-
-WASM格式如下：
-
-最终服务端返回目标代码，前端会对响应的内容做二次处理并执行，对于read和write方法需要前端或者后端自己额外配置，这可能涉及到不同的语法，同时会涉及到一些中断（异步）处理等。
 <div style="text-align:center">
-<img src="https://www.dyp02.vip/assets/imageForOwners/14_1.jpeg " style="max-width:90%; height: auto;" >
+<img src="./assets/JSResult.png" style="max-width:90%; height: auto;" >
 </div>
+WASM格式如下：
+<div style="text-align:center">
+<img src="./assets/WATResult.png" style="max-width:90%; height: auto;" >
+</div>
+最终服务端返回目标代码，前端会对响应的内容做二次处理并执行，对于read和write方法需要前端或者后端自己额外配置，这可能涉及到不同的语法，同时会涉及到一些中断（异步）处理等。
 
 </div>
 
@@ -673,6 +778,10 @@ WASM格式如下：
 
 ## 结语
 
+<div style="text-align:center">
+<!-- <img src="https://www.dyp02.vip/assets/imageForOwners/14_1.jpeg " style="max-width:90%; height: auto;" > -->
+<img src="../15/assets/nav.png" style="max-width:90%; height: auto;" >
+</div>
 本文主要是简单记录一下我对pl0编译器整个的开发过程的记录，虽然本身pl0语言结构比较简单，没有过于复杂的上下文管理、没有引入不同文件或模块的引用等，但是对于一些基本结构的设计开发，比如条件语句的设计（尤其是WASM，因为WASM本身未提供多重条件语句的设计）、变量或者过程的声明或管理等，都让我对编译原理有了更多了了解和认识。
 
 本人可能对一些编译原理更复杂的知识（例如语法分析的其他方式等）掌握的依旧不是很好，但是我希望这是一个新的起点，自己日后也会多加学习，而不是对于开发语言的浅尝辄止。
