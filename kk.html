@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>传统表单功能示例</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+        input, select, textarea, button {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>传统表单功能示例</h1>
+    <form action="/submit" method="post">
+        <fieldset>
+            <legend>基本信息</legend>
+            <label for="username">用户名:</label>
+            <input type="text" id="username" name="username" required>
+            
+            <label for="password">密码:</label>
+            <input type="password" id="password" name="password" required>
+            
+            <label for="email">电子邮箱:</label>
+            <input type="email" id="email" name="email" required>
+            
+            <label for="phone">电话号码:</label>
+            <input type="tel" id="phone" name="phone" required>
+        </fieldset>
+        
+        <fieldset>
+            <legend>选择器</legend>
+            <label for="birthday">生日:</label>
+            <input type="date" id="birthday" name="birthday">
+            
+            <label for="gender">性别:</label>
+            <select id="gender" name="gender">
+                <option value="male">男</option>
+                <option value="female">女</option>
+                <option value="other">其他</option>
+            </select>
+            
+            <label for="color">喜欢的颜色:</label>
+            <input type="color" id="color" name="color">
+            
+            <label for="number">幸运数字:</label>
+            <input type="number" id="number" name="number" min="1" max="100">
+        </fieldset>
+        
+        <fieldset>
+            <legend>其他输入类型</legend>
+            <label for="file">上传文件:</label>
+            <input type="file" id="file" name="file">
+            
+            <label for="range">音量调节:</label>
+            <input type="range" id="range" name="range" min="0" max="100">
+            
+            <label for="website">个人网站:</label>
+            <input type="url" id="website" name="website">
+            
+            <label for="search">搜索:</label>
+            <input type="search" id="search" name="search">
+        </fieldset>
+        
+        <fieldset>
+            <legend>文本区域</legend>
+            <label for="message">留言:</label>
+            <textarea id="message" name="message" rows="4"></textarea>
+        </fieldset>
+        
+        <fieldset>
+            <legend>单选和复选框</legend>
+            <label>喜欢的水果:</label>
+            <input type="checkbox" id="apple" name="fruit" value="apple">
+            <label for="apple">苹果</label>
+            
+            <input type="checkbox" id="banana" name="fruit" value="banana">
+            <label for="banana">香蕉</label>
+            
+            <input type="checkbox" id="cherry" name="fruit" value="cherry">
+            <label for="cherry">樱桃</label>
+            
+            <label>选择一个：</label>
+            <input type="radio" id="option1" name="option" value="option1">
+            <label for="option1">选项1</label>
+            
+            <input type="radio" id="option2" name="option" value="option2">
+            <label for="option2">选项2</label>
+        </fieldset>
+        
+        <button type="submit">提交</button>
+    </form>
+</body>
+</html>
